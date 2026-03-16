@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>今天你想成为谁</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0D0D0D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="羽翎">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- Open Graph (share preview) -->
+<meta property="og:title" content="今天你想成为谁 · 羽翎">
+<meta property="og:description" content="AI影视级妆造 · 骨相定制 · 找到专属于你的风格角色">
+<meta property="og:type" content="website">
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black:  #0D0D0D;
+  --b2:     #141414;
+  --b3:     #1C1C1C;
+  --b4:     #242424;
+  --gold:   #C9A84C;
+  --gold2:  #F5D78E;
+  --gg:     linear-gradient(135deg,#C9A84C,#F5D78E,#C9A84C);
+  --rose:   #B76E79;
+  --purple: #2D1B69;
+  --text:   #F0EDE6;
+  --t2:     #A89F91;
+  --t3:     #5C5650;
+  --border: rgba(201,168,76,0.18);
+  --PW:     375px;
+  --PH:     812px;
+  --RD:     44px;
+  --TH:     68px;
+  --BA:     #C9A84C; /* bone accent - dynamic */
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:#0a0a0a;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  overflow:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 30%,rgba(45,27,105,.25) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 70%,rgba(183,110,121,.15) 0%,transparent 65%),
+    radial-gradient(ellipse 40% 60% at 50% 50%,rgba(201,168,76,.05) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+/* ── Phone Shell ── */
+.shell{
+  width:var(--PW);height:var(--PH);
+  background:#0D0D0D;border-radius:var(--RD);
+  box-shadow:0 0 0 1px rgba(255,255,255,.07),0 0 0 2px rgba(0,0,0,.8),0 0 0 3px rgba(255,255,255,.04),
+    0 50px 120px rgba(0,0,0,.9),0 20px 40px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08);
+  position:relative;overflow:hidden;flex-shrink:0;
+}
+.shell::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:120px;height:30px;background:#0D0D0D;border-radius:0 0 18px 18px;z-index:999;
+}
+.sbar{
+  position:absolute;top:0;left:0;right:0;height:44px;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:0 20px 8px;z-index:900;font-size:11px;font-weight:600;color:rgba(240,237,230,.7);
+}
+.sbar-icons{display:flex;gap:5px;font-size:10px;}
+
+/* ── Screen system ── */
+.screen{
+  position:absolute;inset:0;background:var(--black);
+  display:none;flex-direction:column;opacity:0;transition:opacity .3s;
+}
+.screen.active{display:flex;opacity:1;}
+.screen.fi{animation:fi .35s ease forwards;}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Tab bar ── */
+.tabbar{
+  position:absolute;bottom:0;left:0;right:0;height:var(--TH);
+  background:rgba(13,13,13,.95);backdrop-filter:blur(20px);
+  border-top:1px solid rgba(201,168,76,.12);
+  display:flex;align-items:flex-start;justify-content:space-around;
+  padding-top:10px;z-index:800;
+}
+.ti{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:0 8px;transition:all .2s;}
+.ti .tic{font-size:20px;line-height:1;}
+.ti .til{font-size:9px;letter-spacing:.04em;color:var(--t3);transition:color .2s;}
+.ti.on .til{color:var(--gold);}
+.ti.on .tic{filter:drop-shadow(0 0 4px rgba(201,168,76,.6));}
+
+/* Toast */
+.toast{
+  position:absolute;bottom:calc(var(--TH)+12px);
+  left:50%;transform:translateX(-50%) translateY(20px);
+  background:rgba(28,28,28,.95);border:1px solid var(--border);
+  backdrop-filter:blur(20px);padding:10px 20px;border-radius:20px;
+  font-size:12px;color:var(--text);white-space:nowrap;z-index:999;
+  opacity:0;transition:all .3s;pointer-events:none;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ─────────────────────────────────────────────
+   ONBOARDING SCREENS  (no tab bar)
+───────────────────────────────────────────── */
+
+/* ── OB0: Splash ── */
+#ob0{background:#050505;justify-content:center;align-items:center;text-align:center;}
+.ptcl{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.pt{
+  position:absolute;width:2px;height:2px;background:var(--gold);border-radius:50%;
+  animation:ptf var(--d,6s) ease-in-out infinite;animation-delay:var(--dl,0s);opacity:var(--op,.4);
+}
+@keyframes ptf{
+  0%,100%{transform:translateY(0) translateX(0) scale(1);opacity:var(--op,.4);}
+  33%{transform:translateY(-30px) translateX(10px) scale(1.5);opacity:calc(var(--op,.4)*1.5);}
+  66%{transform:translateY(-15px) translateX(-8px) scale(.8);opacity:calc(var(--op,.4)*.6);}
+}
+.halo{
+  position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);
+  border-radius:50%;border:1px solid rgba(201,168,76,.08);
+  animation:hp 4s ease-in-out infinite;
+}
+.halo:nth-child(1){width:200px;height:200px;}
+.halo:nth-child(2){width:300px;height:300px;animation-delay:.8s;border-color:rgba(183,110,121,.06);}
+.halo:nth-child(3){width:420px;height:420px;animation-delay:1.6s;border-color:rgba(201,168,76,.04);}
+@keyframes hp{0%,100%{opacity:.4;transform:translate(-50%,-50%) scale(1);}50%{opacity:1;transform:translate(-50%,-50%) scale(1.04);}}
+.ob0-c{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;}
+.ob0-ey{font-family:'Playfair Display',serif;font-size:10px;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;margin-bottom:28px;opacity:0;animation:fi .8s .3s forwards;}
+.ob0-t{font-weight:200;font-size:58px;line-height:1.05;color:var(--text);letter-spacing:-.02em;opacity:0;animation:fi .8s .5s forwards;}
+.ob0-t em{font-style:normal;background:var(--gg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700;}
+.ob0-sub{font-size:11px;letter-spacing:.18em;color:var(--t2);text-transform:uppercase;margin-top:20px;opacity:0;animation:fi .8s .8s forwards;}
+.ob0-div{width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:24px 0;opacity:0;animation:fi .8s 1s forwards;}
+.ob0-desc{font-size:12px;color:var(--t2);line-height:1.7;max-width:260px;opacity:0;animation:fi .8s 1.1s forwards;}
+.ob0-btn{
+  margin-top:48px;padding:16px 48px;background:var(--gg);background-size:200%;
+  border:none;border-radius:50px;font-size:14px;letter-spacing:.12em;color:#0D0D0D;font-weight:700;
+  cursor:pointer;opacity:0;animation:fi .8s 1.3s forwards,shimmer 3s 2s infinite;
+  box-shadow:0 8px 32px rgba(201,168,76,.35);transition:transform .2s,box-shadow .2s;
+}
+.ob0-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(201,168,76,.5);}
+@keyframes shimmer{0%,100%{background-position:0%50%}50%{background-position:100%50%}}
+.ob0-ft{position:absolute;bottom:32px;font-size:9px;letter-spacing:.2em;color:var(--t3);text-transform:uppercase;opacity:0;animation:fi .8s 1.5s forwards;}
+
+/* ── OB1: Mirror intro ── */
+#ob1{background:#080808;justify-content:center;align-items:center;padding:0 28px;}
+.ob1-rings{position:absolute;inset:0;pointer-events:none;}
+.ob1-ring{position:absolute;border-radius:50%;border:1px solid rgba(201,168,76,.06);left:50%;top:42%;transform:translate(-50%,-50%);}
+.ob1-ring:nth-child(1){width:220px;height:220px;animation:hp 5s infinite;}
+.ob1-ring:nth-child(2){width:340px;height:340px;animation:hp 5s 1s infinite;}
+.ob1-ring:nth-child(3){width:480px;height:480px;animation:hp 5s 2s infinite;border-color:rgba(183,110,121,.04);}
+.ob1-content{position:relative;z-index:2;text-align:center;display:flex;flex-direction:column;align-items:center;}
+.ob1-glyph{font-size:72px;animation:mirror-float 4s ease-in-out infinite;filter:drop-shadow(0 0 28px rgba(201,168,76,.4));margin-bottom:28px;}
+@keyframes mirror-float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-10px) scale(1.04);}}
+.ob1-badge{font-family:'Cormorant Garamond',serif;font-size:10px;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.ob1-badge::before,.ob1-badge::after{content:'';width:24px;height:1px;background:rgba(201,168,76,.5);}
+.ob1-title{font-size:26px;color:var(--text);font-weight:300;letter-spacing:.04em;margin-bottom:10px;}
+.ob1-sub{font-size:12px;color:var(--t2);line-height:1.8;max-width:290px;margin-bottom:28px;}
+.ob1-chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:32px;}
+.ob1-chip{font-size:10px;padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);color:var(--t2);}
+.ob1-btn{
+  width:100%;padding:15px;background:var(--gg);background-size:200%;
+  border:none;border-radius:14px;font-size:14px;font-weight:700;color:#0D0D0D;
+  cursor:pointer;letter-spacing:.08em;animation:shimmer 3s infinite;
+  box-shadow:0 6px 24px rgba(201,168,76,.35);transition:all .2s;
+}
+.ob1-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(201,168,76,.5);}
+.ob1-skip{margin-top:14px;font-size:11px;color:var(--t3);cursor:pointer;letter-spacing:.06em;transition:color .2s;}
+.ob1-skip:hover{color:var(--t2);}
+
+/* ── OB-QUIZ ── */
+#obq{background:#080808;}
+.obq-top{padding:48px 20px 0;display:flex;align-items:center;gap:12px;}
+.qback{
+  width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:13px;color:var(--t2);flex-shrink:0;transition:all .2s;
+}
+.qback:hover{border-color:var(--gold);color:var(--gold);}
+.qprog{flex:1;}
+.qprog-track{height:2px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;}
+.qprog-fill{height:100%;background:var(--gg);border-radius:2px;transition:width .5s ease;width:5%;}
+.qhead-row{display:flex;justify-content:space-between;margin-bottom:6px;}
+.qcat-label{font-family:'Cormorant Garamond',serif;font-size:10px;color:var(--gold);letter-spacing:.18em;font-style:italic;}
+.qcounter{font-size:10px;color:var(--t3);letter-spacing:.06em;}
+.qcat{padding:22px 20px 6px;font-family:'Cormorant Garamond',serif;font-size:11px;color:var(--gold);letter-spacing:.2em;font-style:italic;}
+.qqtext{padding:0 20px 10px;font-size:20px;color:var(--text);font-weight:300;line-height:1.4;letter-spacing:-.01em;}
+.qhint{padding:0 20px 18px;font-size:11px;color:var(--t3);line-height:1.6;font-style:italic;}
+.qopts{padding:0 20px;display:flex;flex-direction:column;gap:8px;flex:1;overflow-y:auto;scrollbar-width:none;padding-bottom:16px;}
+.qopts::-webkit-scrollbar{display:none;}
+.qopt{
+  padding:12px 14px;border-radius:13px;
+  border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025);
+  color:var(--t2);font-size:12px;line-height:1.5;
+  cursor:pointer;transition:all .2s;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.qopt:hover{border-color:rgba(201,168,76,.3);color:var(--text);}
+.qopt.on{border-color:var(--gold);background:rgba(201,168,76,.08);color:var(--text);}
+.qdot{
+  width:16px;height:16px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.2);flex-shrink:0;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;
+}
+.qopt.on .qdot{background:var(--gold);border-color:var(--gold);}
+.qopt.on .qdot::after{content:'✓';font-size:9px;color:#0D0D0D;font-weight:700;}
+
+/* ── OB-CALC ── */
+#obc{background:#080808;align-items:center;justify-content:center;gap:24px;}
+.calc-rings{position:relative;width:140px;height:140px;}
+.cring{
+  position:absolute;border-radius:50%;border:1px solid rgba(201,168,76,.15);
+  animation:cspin var(--s,8s) linear infinite;left:50%;top:50%;transform-origin:center;
+}
+.cring:nth-child(1){width:80px;height:80px;margin:-40px;--s:6s;border-color:rgba(201,168,76,.3);}
+.cring:nth-child(2){width:110px;height:110px;margin:-55px;--s:9s;animation-direction:reverse;}
+.cring:nth-child(3){width:140px;height:140px;margin:-70px;--s:12s;border-color:rgba(183,110,121,.15);}
+.ccore{
+  position:absolute;width:40px;height:40px;left:50%;top:50%;margin:-20px;
+  background:var(--gg);border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:18px;animation:cpulse 2s ease-in-out infinite;
+}
+@keyframes cspin{to{transform:rotate(360deg);}}
+@keyframes cpulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.15);opacity:.8;}}
+.calc-title{font-size:17px;color:var(--text);font-weight:300;letter-spacing:.04em;}
+.calc-sub{font-size:10px;color:var(--t3);letter-spacing:.12em;text-transform:uppercase;}
+.calc-steps-list{display:flex;flex-direction:column;gap:6px;}
+.cstep{font-size:10px;color:var(--t3);letter-spacing:.06em;display:flex;align-items:center;gap:8px;opacity:0;}
+.cstep.lit{opacity:1;color:var(--gold);animation:fi .3s ease forwards;}
+.cdot{width:4px;height:4px;border-radius:50%;background:currentColor;}
+
+/* ── OB-REVEAL ── */
+#obr{overflow:hidden;}
+.obr-scroll{flex:1;overflow-y:auto;scrollbar-width:none;padding-bottom:24px;}
+.obr-scroll::-webkit-scrollbar{display:none;}
+.obr-hero{
+  padding:52px 20px 20px;position:relative;overflow:hidden;
+  background:radial-gradient(circle at 70% 30%,var(--bone-fade,rgba(201,168,76,.08)) 0%,transparent 60%);
+}
+.obr-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.bone-no-b{
+  padding:3px 10px;border-radius:20px;
+  font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:.15em;
+  color:var(--BA);border:1px solid var(--BA);opacity:.8;
+}
+.bone-rar{font-family:'Playfair Display',serif;font-size:11px;color:var(--BA);font-style:italic;}
+.bone-nm{font-size:30px;color:var(--text);font-weight:600;margin:12px 0 4px;}
+.bone-tr{font-size:11px;color:var(--t3);letter-spacing:.1em;margin-bottom:16px;}
+/* Celeb card */
+.celeb-card{
+  padding:12px 14px;background:rgba(255,255,255,.03);
+  border-radius:14px;border:1px solid rgba(255,255,255,.06);
+  display:flex;align-items:center;gap:12px;margin-bottom:4px;
+}
+.celeb-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.celeb-nm{font-size:13px;color:var(--text);font-weight:600;}
+.celeb-en{font-family:'Playfair Display',serif;font-size:10px;color:var(--BA);font-style:italic;}
+.celeb-tr{font-size:10px;color:var(--t2);margin-top:3px;}
+.celeb-mt{margin-left:auto;text-align:right;}
+.celeb-pct{font-size:15px;font-weight:700;color:var(--BA);}
+.celeb-lbl{font-size:8px;color:var(--t3);}
+/* Props */
+.props-section{padding:0 20px 12px;}
+.sec-title{font-size:10px;color:var(--t3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.sec-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.05);}
+.prop-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+.prop-lbl{font-size:11px;color:var(--t2);width:88px;flex-shrink:0;}
+.prop-bar-wrap{flex:1;height:3px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
+.prop-bar{height:100%;border-radius:3px;background:var(--gg);transition:width .8s ease;}
+.prop-score{font-size:11px;color:var(--BA);font-weight:600;width:28px;text-align:right;}
+/* Insight */
+.insight-box{
+  margin:0 20px 12px;padding:12px 14px;border-radius:14px;
+  background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.12);
+  font-size:11px;color:var(--t2);line-height:1.7;
+}
+.insight-box strong{color:var(--text);}
+/* Color profile */
+.cpb{
+  margin:0 20px 16px;padding:10px 14px;border-radius:14px;
+  display:flex;align-items:flex-start;gap:10px;
+  border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);
+}
+.cpb-dot{width:30px;height:30px;border-radius:50%;flex-shrink:0;margin-top:2px;}
+.cpb-lbl{font-size:11px;color:var(--text);font-weight:600;}
+.cpb-note{font-size:10px;color:var(--t2);margin-top:2px;line-height:1.5;}
+/* Proceed button */
+.obr-cta{
+  margin:4px 20px 0;padding:15px;border-radius:16px;border:none;
+  background:var(--gg);background-size:200%;
+  font-size:14px;font-weight:700;color:#0D0D0D;letter-spacing:.08em;
+  cursor:pointer;animation:shimmer 3s infinite;
+  box-shadow:0 6px 24px rgba(201,168,76,.4);transition:all .2s;
+  width:calc(100% - 40px);
+}
+.obr-cta:hover{transform:translateY(-2px);}
+.obr-sub{text-align:center;font-size:10px;color:var(--t3);margin-top:8px;letter-spacing:.04em;}
+
+/* ── OBF: FREE LOOK REVEAL ── */
+#obf{overflow:hidden;flex-direction:column;}
+.obf-bg{
+  position:absolute;inset:0;
+  background:var(--bone-fade,linear-gradient(160deg,#1a1200 0%,#0D0D0D 60%));
+  opacity:.9;z-index:0;transition:background 1s;
+}
+.obf-content{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;
+  width:100%;height:100%;overflow-y:auto;scrollbar-width:none;
+  padding:52px 24px 32px;
+}
+.obf-content::-webkit-scrollbar{display:none;}
+.obf-tag{
+  font-size:10px;letter-spacing:.18em;color:var(--BA,#C9A84C);
+  text-transform:uppercase;margin-bottom:20px;
+  border:1px solid rgba(201,168,76,.3);padding:4px 14px;border-radius:20px;
+}
+.obf-visual{
+  width:140px;height:140px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:60px;margin-bottom:24px;
+  background:var(--bone-fade,linear-gradient(135deg,#1a1200,#2a2000));
+  border:2px solid rgba(201,168,76,.25);
+  box-shadow:0 0 40px rgba(201,168,76,.15),0 0 80px rgba(201,168,76,.05);
+  animation:hp 4s ease-in-out infinite;
+}
+.obf-role{
+  font-family:'Cormorant Garamond',serif;
+  font-size:13px;letter-spacing:.2em;color:var(--BA,#C9A84C);
+  margin-bottom:10px;text-transform:uppercase;
+}
+.obf-headline{
+  font-family:'Playfair Display',serif;
+  font-size:22px;font-weight:600;color:var(--text);
+  text-align:center;line-height:1.45;margin-bottom:24px;
+  text-shadow:0 2px 20px rgba(201,168,76,.2);
+}
+.obf-items{
+  width:100%;display:flex;flex-direction:column;gap:10px;margin-bottom:20px;
+}
+.obf-item{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
+  border-radius:12px;padding:12px 16px;
+}
+.obf-item-ic{
+  width:32px;height:32px;border-radius:8px;
+  background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--BA,#C9A84C);
+  flex-shrink:0;
+}
+.obf-item-info{flex:1;}
+.obf-item-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.obf-item-desc{font-size:10px;color:var(--t2);letter-spacing:.02em;}
+.obf-item-chk{color:var(--BA,#C9A84C);font-size:14px;}
+.obf-desc{
+  font-size:12px;color:var(--t2);text-align:center;line-height:1.7;
+  margin-bottom:28px;padding:0 8px;
+}
+.obf-cta{
+  width:100%;padding:16px;border-radius:16px;border:none;
+  background:var(--gg);background-size:200%;
+  font-size:14px;font-weight:700;color:#0D0D0D;letter-spacing:.08em;
+  cursor:pointer;animation:shimmer 3s infinite;
+  box-shadow:0 6px 24px rgba(201,168,76,.4);transition:all .2s;
+  margin-bottom:12px;
+}
+.obf-cta:hover{transform:translateY(-2px);}
+.obf-free-badge{
+  font-size:10px;color:var(--t3);letter-spacing:.06em;
+  display:flex;align-items:center;gap:6px;
+}
+.obf-free-badge::before,.obf-free-badge::after{
+  content:'';width:24px;height:1px;background:rgba(255,255,255,.1);
+}
+
+/* ── OBCH: CHOICE SCREEN ── */
+#obch{overflow:hidden;flex-direction:column;justify-content:flex-start;}
+.obch-top{position:relative;z-index:1;text-align:center;padding:52px 24px 20px;}
+.obch-glyph{font-size:52px;margin-bottom:14px;animation:mirror-float 4s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(201,168,76,.3));}
+.obch-title{font-size:22px;color:var(--text);font-weight:300;letter-spacing:.04em;margin-bottom:6px;}
+.obch-sub{font-size:11px;color:var(--t2);letter-spacing:.1em;}
+.obch-cards{display:flex;gap:12px;padding:20px 20px 0;flex:1;align-items:center;max-height:380px;}
+.obch-card{flex:1;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:28px 14px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;height:100%;}
+.obch-card:active{transform:scale(.97);}
+.obch-card.hl{border-color:rgba(201,168,76,.3);background:rgba(201,168,76,.04);}
+.obch-card-tag{position:absolute;top:12px;right:10px;font-size:8px;letter-spacing:.08em;padding:3px 8px;border-radius:10px;font-weight:700;}
+.obch-card-tag.new{background:rgba(183,110,121,.25);color:#e89aaa;border:1px solid rgba(183,110,121,.3);}
+.obch-card-tag.classic{background:rgba(201,168,76,.12);color:var(--gold);border:1px solid rgba(201,168,76,.2);}
+.obch-card-ic{font-size:42px;margin-bottom:6px;}
+.obch-card-name{font-size:15px;font-weight:700;color:var(--text);letter-spacing:.04em;text-align:center;}
+.obch-card-desc{font-size:10px;color:var(--t2);text-align:center;line-height:1.7;letter-spacing:.02em;}
+.obch-card-badge{font-size:9px;padding:4px 12px;border-radius:10px;background:rgba(255,255,255,.05);color:var(--t2);margin-top:2px;}
+.obch-card.hl .obch-card-badge{background:rgba(201,168,76,.1);color:var(--gold);}
+.obch-hint{font-size:10px;color:var(--t3);text-align:center;padding:16px 24px 20px;letter-spacing:.04em;line-height:1.7;}
+.obch-hint em{color:rgba(255,100,120,.6);font-style:normal;}
+
+/* ── OBS2: PHOTO UPLOAD ── */
+#obs2{overflow:hidden;flex-direction:column;justify-content:flex-start;padding:48px 28px 28px;}
+.obs2-head{text-align:center;margin-bottom:20px;width:100%;}
+.obs2-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;letter-spacing:.15em;color:var(--text);margin-bottom:6px;}
+.obs2-sub{font-size:10px;color:var(--t2);letter-spacing:.15em;}
+.obs2-grid-wrap{width:260px;height:340px;position:relative;margin:0 auto 14px;flex-shrink:0;}
+.obs2-grid-frame{width:100%;height:100%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);position:relative;}
+.obs2-grid-frame::before{content:'';position:absolute;inset:0;border:1px solid rgba(201,168,76,.3);}
+.obs2-grid-cell{border:1px dashed rgba(201,168,76,.12);}
+.obs2-corner{position:absolute;width:20px;height:20px;}
+.obs2-corner.tl{top:-1px;left:-1px;border-top:2px solid var(--gold);border-left:2px solid var(--gold);}
+.obs2-corner.tr{top:-1px;right:-1px;border-top:2px solid var(--gold);border-right:2px solid var(--gold);}
+.obs2-corner.bl{bottom:-1px;left:-1px;border-bottom:2px solid var(--gold);border-left:2px solid var(--gold);}
+.obs2-corner.br{bottom:-1px;right:-1px;border-bottom:2px solid var(--gold);border-right:2px solid var(--gold);}
+.obs2-scan-line{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,rgba(201,168,76,.7),transparent);animation:obs-scan 2.4s ease-in-out infinite;}
+@keyframes obs-scan{0%{top:0;}100%{top:100%;}}
+.obs2-oval{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:122px;height:168px;border:1px dashed rgba(201,168,76,.5);border-radius:50% 50% 44% 44%;}
+.obs2-tip{font-size:10px;color:var(--t2);letter-spacing:.1em;text-align:center;margin-bottom:16px;}
+.obs2-btn{width:100%;padding:15px;border-radius:16px;border:none;background:var(--gg);background-size:200%;font-size:13px;font-weight:700;color:#0D0D0D;letter-spacing:.08em;cursor:pointer;animation:shimmer 3s infinite;box-shadow:0 6px 24px rgba(201,168,76,.35);}
+.obs2-back{text-align:center;margin-top:10px;font-size:11px;color:var(--t3);cursor:pointer;letter-spacing:.04em;}
+
+/* ── OBS3: SCANNING ── */
+#obs3{overflow:hidden;flex-direction:column;}
+.obs3-rings{position:relative;width:180px;height:180px;margin:0 auto 36px;flex-shrink:0;}
+.obs3-ring{position:absolute;border-radius:50%;}
+.obs3-ring.r1{inset:0;border:1px solid rgba(201,168,76,.25);animation:spin 4s linear infinite;border-top-color:var(--gold);}
+.obs3-ring.r2{inset:20px;border:1px solid rgba(201,168,76,.1);animation:spin 2.5s linear infinite reverse;border-right-color:rgba(201,168,76,.3);}
+.obs3-ring.r3{inset:40px;border:1px dashed rgba(201,168,76,.15);animation:spin 6s linear infinite;}
+.obs3-ring.r4{inset:60px;border:1px solid rgba(201,168,76,.08);}
+.obs3-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.obs3-dot{width:12px;height:12px;background:var(--gold);border-radius:50%;animation:pulse-dot 1.5s ease-in-out infinite;box-shadow:0 0 16px rgba(201,168,76,.5);}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.6);opacity:.5;}}
+.obs3-label{font-family:'Playfair Display',serif;font-size:18px;letter-spacing:.2em;color:var(--text);margin-bottom:28px;}
+.obs3-steps{display:flex;flex-direction:column;gap:12px;width:240px;}
+.obs3-step{display:flex;align-items:center;gap:12px;opacity:0;animation:step-fade .5s ease forwards;}
+.obs3-step:nth-child(1){animation-delay:.5s;}
+.obs3-step:nth-child(2){animation-delay:1.1s;}
+.obs3-step:nth-child(3){animation-delay:1.7s;}
+.obs3-step:nth-child(4){animation-delay:2.3s;}
+@keyframes step-fade{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:none;}}
+.obs3-step-dot{width:6px;height:6px;border-radius:50%;background:rgba(201,168,76,.4);flex-shrink:0;}
+.obs3-step-txt{font-size:11px;color:var(--t2);letter-spacing:.12em;}
+
+/* ── SHARE MODAL ── */
+.share-overlay{position:absolute;inset:0;background:rgba(0,0,0,.82);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .3s;}
+.share-overlay.on{opacity:1;pointer-events:all;}
+.share-sheet{width:100%;background:var(--b2);border-radius:20px 20px 0 0;padding:20px 20px 28px;display:flex;flex-direction:column;align-items:center;}
+.share-handle{width:36px;height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin-bottom:16px;}
+.share-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;letter-spacing:.04em;}
+.share-card{width:100%;background:linear-gradient(145deg,#0c0900,#150f00,#0a081a);border:1px solid rgba(201,168,76,.25);border-radius:14px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden;}
+.share-card::before{content:'';position:absolute;inset:0;background:var(--bone-fade,linear-gradient(135deg,rgba(201,168,76,.07),transparent));pointer-events:none;}
+.share-card-eyebrow{font-size:9px;letter-spacing:.2em;color:var(--BA,#C9A84C);margin-bottom:8px;opacity:.8;}
+.share-card-bone{font-size:18px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.share-card-role{font-size:10px;color:var(--t2);margin-bottom:10px;letter-spacing:.04em;}
+.share-card-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.share-card-pill{font-size:9px;padding:3px 8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:6px;color:var(--t2);}
+.share-card-tag{font-size:9px;color:var(--t3);letter-spacing:.1em;}
+.share-actions{display:flex;gap:8px;width:100%;margin-bottom:4px;}
+.share-act-btn{flex:1;padding:12px 8px;border-radius:12px;border:none;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:all .2s;}
+.share-act-btn.primary{background:var(--gg);color:#0D0D0D;}
+.share-act-btn.secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.08);}
+.share-hint{font-size:9px;color:var(--t3);letter-spacing:.06em;margin-bottom:10px;}
+.share-close{font-size:11px;color:var(--t3);cursor:pointer;letter-spacing:.06em;}
+
+/* ─────────────────────────────────────────────
+   MAIN APP SCREENS
+───────────────────────────────────────────── */
+
+/* ── S2: ROLE ── */
+#s2{padding-bottom:var(--TH);}
+.s2-hd{padding:52px 20px 16px;display:flex;align-items:center;gap:12px;}
+.bk-btn{
+  width:32px;height:32px;border-radius:50%;border:1px solid var(--border);
+  background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:14px;color:var(--t2);transition:all .2s;flex-shrink:0;
+}
+.bk-btn:hover{border-color:var(--gold);color:var(--gold);}
+.s2-hd-t h2{font-size:20px;color:var(--text);font-weight:600;}
+.s2-hd-t p{font-size:11px;color:var(--t2);margin-top:2px;}
+.s2-sub{padding:0 20px 14px;font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;}
+/* Role scroll */
+.role-scroll{display:flex;gap:14px;overflow-x:auto;padding:4px 20px 16px;scrollbar-width:none;}
+.role-scroll::-webkit-scrollbar{display:none;}
+.rcard{
+  flex-shrink:0;width:200px;border-radius:20px;overflow:hidden;cursor:pointer;
+  transition:transform .25s,box-shadow .25s;border:1px solid rgba(255,255,255,.06);
+  position:relative;
+}
+.rcard:hover{transform:translateY(-4px);}
+.rcard.sel{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.4);}
+.rcard-art{height:180px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.rcard-art::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,.7) 100%);}
+.re{font-size:64px;position:relative;z-index:1;filter:drop-shadow(0 4px 20px rgba(0,0,0,.5));animation:fe 3s ease-in-out infinite;}
+@keyframes fe{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.rc-city{background:linear-gradient(135deg,#0f2444,#1a3a6e,#b8923a);}
+.rc-sweet{background:linear-gradient(135deg,#2a0f1f,#7c3355,#e8a0b4);}
+.rc-cyber{background:linear-gradient(135deg,#0d0020,#3d0070,rgba(0,255,157,.2));}
+.rc-forest{background:linear-gradient(135deg,#0a1a0a,#1a3d2b,#4a7c59);}
+.rc-retro{background:linear-gradient(135deg,#1a0000,#5c1a1a,#8b6914);}
+/* Recommended badge */
+.rec-badge{
+  position:absolute;top:8px;left:8px;z-index:2;
+  padding:3px 9px;border-radius:20px;font-size:9px;
+  background:rgba(201,168,76,.9);color:#0D0D0D;font-weight:700;
+  letter-spacing:.04em;
+}
+.rcard-body{padding:14px;background:rgba(13,13,13,.96);}
+.rcard-nm{font-size:15px;color:var(--text);font-weight:600;margin-bottom:2px;}
+.rcard-en{font-family:'Playfair Display',serif;font-size:10px;color:var(--gold);letter-spacing:.1em;font-style:italic;margin-bottom:10px;}
+.rtags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;}
+.rtag{font-size:9px;padding:3px 8px;border-radius:20px;border:1px solid rgba(255,255,255,.12);color:var(--t2);}
+.rsel-btn{
+  width:100%;padding:10px;border-radius:12px;border:1px solid rgba(201,168,76,.25);
+  background:rgba(201,168,76,.1);color:var(--gold);font-size:12px;cursor:pointer;transition:all .2s;
+}
+.rsel-btn:hover,.rcard.sel .rsel-btn{background:var(--gg);color:#0D0D0D;font-weight:700;border-color:transparent;box-shadow:0 4px 16px rgba(201,168,76,.3);}
+.role-tip{padding:0 20px 12px;font-size:10px;color:var(--t3);text-align:center;}
+/* Bone match strip */
+.bone-match-strip{
+  margin:0 20px 4px;padding:10px 14px;border-radius:12px;
+  background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);
+  display:flex;align-items:center;gap:10px;
+}
+.bms-icon{font-size:18px;}
+.bms-text{font-size:11px;color:var(--t2);line-height:1.5;}
+.bms-text strong{color:var(--text);}
+
+/* ── S3: WARDROBE ── */
+#s3{padding-bottom:var(--TH);}
+.ward-hd{padding:52px 20px 0;}
+.ward-role{font-family:'Playfair Display',serif;font-size:11px;color:var(--gold);letter-spacing:.14em;font-style:italic;margin-bottom:4px;}
+.ward-title{font-size:22px;color:var(--text);font-weight:600;margin-bottom:16px;}
+.ward-stats{display:flex;gap:12px;margin-bottom:16px;}
+.stat-chip{padding:8px 16px;border-radius:20px;background:var(--b3);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;}
+.stat-n{font-size:18px;font-weight:700;color:var(--text);}
+.stat-l{font-size:9px;color:var(--t3);margin-top:1px;}
+.srch{margin:0 20px 14px;position:relative;}
+.srch-in{width:100%;padding:10px 16px 10px 36px;background:var(--b3);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:13px;outline:none;}
+.srch-in::placeholder{color:var(--t3);}
+.srch-ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--t3);}
+.ctabs{display:flex;padding:0 20px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;gap:4px;}
+.ctabs::-webkit-scrollbar{display:none;}
+.ctab{padding:6px 14px;border-radius:20px;font-size:11px;color:var(--t3);cursor:pointer;white-space:nowrap;transition:all .2s;border:1px solid transparent;}
+.ctab.on{color:var(--gold);border-color:rgba(201,168,76,.3);background:rgba(201,168,76,.08);}
+.clothes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 20px 12px;}
+.ci{border-radius:12px;overflow:hidden;aspect-ratio:3/4;position:relative;cursor:pointer;transition:transform .2s;}
+.ci:hover{transform:scale(1.04);}
+.cb{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+.cci{font-size:22px;}
+.ccl{font-size:7px;color:rgba(255,255,255,.6);text-align:center;padding:0 4px;line-height:1.3;}
+.ci.fav::after{content:'♥';position:absolute;top:4px;right:6px;font-size:10px;color:var(--rose);}
+.cg1{background:linear-gradient(135deg,#1a2a4a,#2d4a8a);}
+.cg2{background:linear-gradient(135deg,#2a1a2a,#5c2d5c);}
+.cg3{background:linear-gradient(135deg,#0d1a1a,#1a4a3a);}
+.cg4{background:linear-gradient(135deg,#2a1a00,#5c4400);}
+.cg5{background:linear-gradient(135deg,#1a0a0a,#4a1a1a);}
+.cg6{background:linear-gradient(135deg,#0d0d2a,#1a1a5c);}
+.cg7{background:linear-gradient(135deg,#1a1a00,#3d3d00);}
+.cg8{background:linear-gradient(135deg,#2a0a1a,#7c2a4a);}
+.ai-ban{
+  margin:4px 20px 8px;padding:14px 16px;border-radius:16px;
+  background:linear-gradient(135deg,rgba(45,27,105,.6),rgba(201,168,76,.1));
+  border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;transition:all .2s;
+}
+.ai-ban-l{display:flex;align-items:center;gap:10px;}
+.ai-ban-ic{width:36px;height:36px;border-radius:10px;background:var(--gg);display:flex;align-items:center;justify-content:center;font-size:18px;}
+.ai-ban-t h4{font-size:13px;color:var(--text);font-weight:600;}
+.ai-ban-t p{font-size:10px;color:var(--t2);margin-top:1px;}
+.fab{position:absolute;bottom:calc(var(--TH)+16px);right:16px;width:48px;height:48px;border-radius:50%;background:var(--gg);display:flex;align-items:center;justify-content:center;font-size:22px;color:#0D0D0D;cursor:pointer;z-index:100;box-shadow:0 6px 24px rgba(201,168,76,.5);transition:all .2s;}
+.fab:hover{transform:scale(1.1) rotate(45deg);}
+
+/* ── S4: FITTING ── */
+#s4{padding-bottom:var(--TH);}
+.fit-hd{padding:52px 20px 12px;display:flex;align-items:center;justify-content:space-between;}
+.fit-title{font-size:18px;color:var(--text);font-weight:600;}
+.fit-sub{font-size:10px;color:var(--gold);font-family:'Playfair Display',serif;font-style:italic;}
+.filter-tag{padding:6px 12px;border-radius:20px;border:1px solid var(--border);font-size:10px;color:var(--t2);cursor:pointer;}
+.fit-stage{margin:0 16px;height:320px;border-radius:20px;position:relative;overflow:hidden;cursor:pointer;}
+.fbg{position:absolute;inset:0;transition:all .6s;}
+.fbg.n{background:linear-gradient(160deg,#0d1a2e,#1a0d2e,#2d1b0d);}
+.fbg.f{background:linear-gradient(160deg,#1a0a00,#2d1500,#000);filter:sepia(.4) contrast(1.1);}
+.fbg.f::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);}
+.pers{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:130px;height:260px;}
+.psvg{width:100%;height:100%;fill:rgba(201,168,76,.08);stroke:rgba(201,168,76,.35);stroke-width:.8;filter:drop-shadow(0 0 20px rgba(201,168,76,.15));}
+.picker{position:absolute;right:10px;top:10px;bottom:10px;width:54px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;scrollbar-width:none;}
+.picker::-webkit-scrollbar{display:none;}
+.pitm{width:50px;height:54px;border-radius:12px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:1px solid rgba(255,255,255,.08);transition:all .2s;}
+.pitm:hover,.pitm.on{border-color:var(--gold);box-shadow:0 0 12px rgba(201,168,76,.3);}
+.pitm .pii{font-size:20px;}
+.pitm .pil{font-size:7px;color:rgba(255,255,255,.5);}
+.pi1{background:linear-gradient(135deg,#0d1a3a,#1e3a7c);}
+.pi2{background:linear-gradient(135deg,#1a0a1a,#5c2080);}
+.pi3{background:linear-gradient(135deg,#0a1a0a,#2d5c2d);}
+.pi4{background:linear-gradient(135deg,#2a1a00,#7c5200);}
+.pi5{background:linear-gradient(135deg,#1a0a0a,#7c1a1a);}
+.pi6{background:linear-gradient(135deg,#0a0a1a,#1a1a5c);}
+.stg-hint{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-size:9px;color:rgba(201,168,76,.5);letter-spacing:.1em;white-space:nowrap;text-transform:uppercase;}
+.filter-badge2{position:absolute;top:10px;left:10px;padding:4px 10px;border-radius:20px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);font-size:9px;color:var(--gold);letter-spacing:.1em;opacity:0;transition:opacity .3s;}
+.filter-badge2.on{opacity:1;}
+.fit-outfit{margin:0 16px;padding:10px 14px;background:var(--b3);border-radius:12px;border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.fod-l{display:flex;align-items:center;gap:8px;}
+.fod-dot{width:28px;height:28px;border-radius:8px;}
+.fod-nm{font-size:12px;color:var(--text);}
+.fod-sub{font-size:9px;color:var(--t3);margin-top:1px;}
+.fod-p{font-size:13px;color:var(--gold);font-weight:600;}
+.fit-acts{display:flex;gap:8px;padding:10px 16px 8px;}
+.fa-btn{flex:1;padding:11px 6px;border-radius:13px;border:1px solid var(--border);background:var(--b3);color:var(--t2);font-size:11px;cursor:pointer;text-align:center;transition:all .2s;}
+.fa-btn:hover{border-color:var(--gold);color:var(--gold);}
+.fa-btn.pri{background:var(--gg);color:#0D0D0D;font-weight:700;border-color:transparent;}
+
+/* ── S5: 骨相妆造报告 ── */
+#s5{padding-bottom:var(--TH);}
+.s5-st{display:none;flex-direction:column;flex:1;overflow:hidden;}
+.s5-st.on{display:flex;}
+
+/* S5 entry (no test done) */
+#s5e{overflow-y:auto;scrollbar-width:none;}
+#s5e::-webkit-scrollbar{display:none;}
+.s5e-hd{padding:52px 20px 16px;}
+.s5e-ey{font-family:'Playfair Display',serif;font-size:10px;color:var(--gold);letter-spacing:.18em;font-style:italic;}
+.s5e-title{font-size:22px;color:var(--text);font-weight:600;margin-top:4px;}
+.mir-card{
+  margin:0 20px 16px;border-radius:20px;overflow:hidden;
+  border:1px solid rgba(201,168,76,.25);cursor:pointer;transition:all .25s;
+}
+.mir-card:hover{border-color:rgba(201,168,76,.5);transform:translateY(-2px);}
+.mir-art{
+  height:140px;background:linear-gradient(135deg,#080808,#1a0a2a,#0a1a0a);
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+}
+.mir-art::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(201,168,76,.12),transparent 70%);}
+.mir-glyph{font-size:56px;z-index:1;filter:drop-shadow(0 0 20px rgba(201,168,76,.4));animation:mirror-float 4s ease-in-out infinite;}
+.mir-body{padding:14px 16px 16px;background:var(--b3);}
+.mir-bdg{display:inline-flex;align-items:center;gap:6px;font-size:9px;letter-spacing:.12em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;}
+.mir-bdg::before{content:'';width:16px;height:1px;background:var(--gold);opacity:.5;}
+.mir-body h3{font-size:15px;color:var(--text);font-weight:600;margin-bottom:4px;}
+.mir-body p{font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:12px;}
+.mir-feats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.mir-feat{font-size:9px;padding:3px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.1);color:var(--t3);}
+.mir-btn{width:100%;padding:12px;background:var(--gg);background-size:200%;border:none;border-radius:12px;font-size:13px;font-weight:700;color:#0D0D0D;cursor:pointer;letter-spacing:.06em;animation:shimmer 3s infinite;transition:box-shadow .2s;}
+.mir-btn:hover{box-shadow:0 4px 20px rgba(201,168,76,.5);}
+
+/* S5 result */
+#s5r{overflow:hidden;}
+.s5r-scroll{flex:1;overflow-y:auto;scrollbar-width:none;}
+.s5r-scroll::-webkit-scrollbar{display:none;}
+/* Bone hero (compact for S5) */
+.s5r-hero{
+  padding:52px 20px 16px;position:relative;overflow:hidden;
+  background:radial-gradient(circle at 80% 30%,var(--bone-fade,rgba(201,168,76,.08)) 0%,transparent 60%);
+}
+.s5r-top{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:1;}
+.s5r-nm{font-size:24px;color:var(--text);font-weight:600;margin:8px 0 4px;position:relative;z-index:1;}
+.s5r-tr{font-size:11px;color:var(--t3);letter-spacing:.1em;position:relative;z-index:1;}
+/* Result tabs */
+.rtabs{display:flex;gap:0;padding:0 20px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.rtab{flex:1;padding:10px 4px;text-align:center;font-size:11px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
+.rtab.on{color:var(--BA);border-bottom-color:var(--BA);}
+.rpanel{padding:14px 20px 8px;display:none;}
+.rpanel.on{display:block;}
+/* Swatch groups */
+.sg-t{font-size:10px;color:var(--t3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.sg-t::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.05);}
+.sw-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+.sw-itm{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.sw-c{width:36px;height:36px;border-radius:50%;box-shadow:0 2px 10px rgba(0,0,0,.4);transition:transform .2s;border:2px solid transparent;}
+.sw-c:hover{transform:scale(1.12);}
+.sw-itm.rec .sw-c{border-color:var(--BA);box-shadow:0 0 10px rgba(201,168,76,.35);}
+.sw-nm{font-size:8px;color:var(--t3);text-align:center;max-width:40px;line-height:1.2;}
+.sw-tip{padding:9px 12px;border-radius:12px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.12);font-size:10px;color:var(--t2);line-height:1.6;margin-top:6px;}
+.sw-tip strong{color:var(--text);}
+.sw-av{margin-top:8px;display:flex;align-items:center;gap:8px;}
+.av-lbl{font-size:9px;color:var(--t3);flex-shrink:0;}
+.av-sw{display:flex;gap:6px;}
+.av-s{width:20px;height:20px;border-radius:50%;position:relative;}
+.av-s::after{content:'×';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,80,80,.9);font-weight:700;}
+/* Guide */
+.gi{display:flex;gap:12px;padding:12px;border-radius:14px;background:var(--b3);border:1px solid rgba(255,255,255,.04);margin-bottom:10px;}
+.gi-ic{width:32px;height:32px;border-radius:10px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--BA);font-weight:600;font-family:'Cormorant Garamond',serif;flex-shrink:0;}
+.gi-tt{font-size:13px;color:var(--text);font-weight:600;margin-bottom:4px;}
+.gi-desc{font-size:10px;color:var(--t2);line-height:1.6;}
+.gi-desc strong{color:var(--text);}
+/* Forbid */
+.fbd-head{display:flex;align-items:center;gap:8px;padding:0 0 12px;font-size:11px;color:var(--t3);}
+.fbd-list{display:flex;flex-direction:column;gap:8px;}
+.fbd-itm{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:rgba(255,40,40,.04);border:1px solid rgba(255,40,40,.1);}
+.fbd-x{font-size:14px;color:#e05050;font-weight:700;flex-shrink:0;}
+.fbd-txt{font-size:12px;color:var(--t2);}
+/* CTA to package */
+.s5r-cta{
+  margin:12px 20px 4px;padding:14px 16px;border-radius:16px;
+  background:linear-gradient(135deg,rgba(45,27,105,.5),rgba(201,168,76,.08));
+  border:1px solid rgba(201,168,76,.2);
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all .2s;
+}
+.s5r-cta:hover{border-color:rgba(201,168,76,.45);}
+.s5r-cta-t h4{font-size:13px;color:var(--text);font-weight:600;}
+.s5r-cta-t p{font-size:10px;color:var(--t2);margin-top:2px;}
+.s5r-cta-ic{width:32px;height:32px;border-radius:50%;background:var(--gg);display:flex;align-items:center;justify-content:center;font-size:14px;color:#0D0D0D;flex-shrink:0;}
+.retake-btn{display:block;width:calc(100% - 40px);margin:8px 20px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:transparent;color:var(--t3);font-size:11px;cursor:pointer;text-align:center;letter-spacing:.04em;transition:all .2s;}
+.retake-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* ── S6: PACKAGE ── */
+#s6{padding-bottom:var(--TH);}
+.pkg-hd{padding:52px 20px 8px;}
+.pkg-ey{font-family:'Playfair Display',serif;font-size:10px;color:var(--gold);letter-spacing:.18em;font-style:italic;}
+.pkg-ti{font-size:22px;color:var(--text);font-weight:600;margin-top:4px;}
+.pkg-hero{margin:12px 20px;height:120px;border-radius:18px;background:linear-gradient(135deg,var(--purple),#4a1a4a,#2d1b00);position:relative;overflow:hidden;display:flex;align-items:center;padding:0 20px;gap:16px;}
+.pkg-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 50%,rgba(201,168,76,.2),transparent 60%);}
+.phe-ic{font-size:52px;z-index:1;}
+.phe-t{z-index:1;}
+.phe-t h3{font-size:16px;color:var(--text);font-weight:700;}
+.phe-t p{font-size:10px;color:var(--t2);margin-top:3px;}
+.phe-bdg{position:absolute;top:12px;right:12px;padding:4px 10px;border-radius:20px;background:rgba(201,168,76,.2);border:1px solid rgba(201,168,76,.4);font-size:9px;color:var(--gold);}
+.ps-sec{padding:0 20px;margin-bottom:8px;}
+.ps-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.ps-ic{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.ps-tl{font-size:12px;color:var(--t2);font-weight:600;letter-spacing:.06em;}
+.ps-tag{margin-left:auto;font-size:9px;padding:2px 8px;border-radius:10px;}
+.ir{background:rgba(45,27,105,.4);} .ib{background:rgba(183,110,121,.3);} .ig{background:rgba(201,168,76,.15);}
+.tr{color:#a89ef5;border:1px solid rgba(168,158,245,.3);} .tb{color:var(--rose);border:1px solid rgba(183,110,121,.3);} .tg{color:var(--gold);border:1px solid rgba(201,168,76,.3);}
+.pitms{display:flex;flex-direction:column;gap:7px;}
+.pitm2{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--b3);border:1px solid rgba(255,255,255,.04);}
+.pth{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.pin h5{font-size:12px;color:var(--text);}
+.pin p{font-size:10px;color:var(--t3);margin-top:1px;}
+.pp{margin-left:auto;text-align:right;font-size:12px;color:var(--t2);white-space:nowrap;}
+.pp .pn{color:var(--gold);font-weight:600;}
+.pkg-div{margin:8px 20px;border:none;border-top:1px solid rgba(255,255,255,.05);}
+.price-box{margin:0 20px 12px;padding:14px 16px;border-radius:16px;background:var(--b3);border:1px solid var(--border);}
+.pr-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.pr-row:last-child{margin-bottom:0;}
+.pr-l{font-size:11px;color:var(--t3);}
+.pr-v{font-size:11px;color:var(--t2);}
+.pr-row.tot .pr-l{font-size:13px;color:var(--text);font-weight:600;}
+.pr-row.tot .pr-v{font-size:20px;color:var(--gold);font-weight:700;}
+.pr-row.tot .pr-v span{font-size:12px;}
+.pr-save{display:inline-block;margin-top:8px;padding:3px 10px;border-radius:10px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);font-size:10px;color:var(--gold);}
+.buy-btn{margin:0 20px 6px;width:calc(100% - 40px);padding:16px;border-radius:16px;border:none;background:var(--gg);background-size:200%;color:#0D0D0D;font-size:15px;font-weight:700;letter-spacing:.1em;cursor:pointer;box-shadow:0 8px 28px rgba(201,168,76,.4);animation:shimmer 3s infinite;transition:all .2s;}
+.buy-btn:hover{transform:translateY(-2px);}
+.buy-ft{text-align:center;font-size:9px;color:var(--t3);padding-bottom:4px;}
+
+/* ── S7: MEMBER ── */
+#s7{padding-bottom:var(--TH);}
+.uc{margin:52px 20px 16px;padding:16px;border-radius:18px;background:linear-gradient(135deg,#1a0a2a,#2d1b00,#1a0a0a);border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;}
+.uc::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 90% 50%,rgba(201,168,76,.1),transparent 60%);}
+.uav{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--rose));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;border:2px solid rgba(201,168,76,.3);box-shadow:0 0 20px rgba(201,168,76,.2);}
+.uin{flex:1;z-index:1;}
+.unm{font-size:16px;color:var(--text);font-weight:600;}
+.uid{font-size:10px;color:var(--t3);margin-top:2px;}
+.ubadge{display:inline-block;margin-top:6px;padding:4px 12px;border-radius:20px;background:var(--gg);font-size:10px;color:#0D0D0D;font-weight:700;letter-spacing:.06em;}
+.ulv{position:absolute;right:16px;top:50%;transform:translateY(-50%);text-align:right;z-index:1;}
+.ulvn{font-family:'Playfair Display',serif;font-size:32px;color:rgba(201,168,76,.2);font-weight:700;line-height:1;}
+.ulvl{font-size:9px;color:var(--t3);letter-spacing:.1em;}
+.mem-st{padding:0 20px 10px;font-size:11px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;}
+.bens{padding:0 20px;display:flex;flex-direction:column;gap:8px;}
+.ben{padding:14px;border-radius:14px;background:var(--b3);border:1px solid rgba(255,255,255,.04);display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:border-color .2s;}
+.ben:hover{border-color:var(--border);}
+.ben-ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.bic1{background:linear-gradient(135deg,#1a1a4a,#2d2d8a);}
+.bic2{background:linear-gradient(135deg,#2a0a1a,#7c2a4a);}
+.bic3{background:linear-gradient(135deg,#1a1a00,#4a4a00);}
+.ben-t h4{font-size:13px;color:var(--text);font-weight:600;}
+.ben-t p{font-size:10px;color:var(--t2);margin-top:3px;line-height:1.5;}
+.ben-ar{margin-left:auto;font-size:14px;color:var(--t3);padding-top:2px;}
+.ord-tabs{display:flex;padding:0 20px 10px;margin-top:16px;}
+.ord-tab{flex:1;padding:8px;text-align:center;font-size:11px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
+.ord-tab.on{color:var(--gold);border-bottom-color:var(--gold);}
+.ord-list{padding:0 20px;display:flex;flex-direction:column;gap:8px;}
+.ord-c{padding:12px 14px;border-radius:14px;background:var(--b3);border:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:10px;}
+.ord-th{width:44px;height:50px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.ord-in h5{font-size:12px;color:var(--text);}
+.ord-in p{font-size:10px;color:var(--t3);margin-top:2px;}
+.ord-st{margin-left:auto;padding:4px 10px;border-radius:20px;font-size:9px;white-space:nowrap;}
+.ost-a{background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.2);}
+.ost-d{background:rgba(255,255,255,.04);color:var(--t3);border:1px solid rgba(255,255,255,.08);}
+.upg-c{margin:16px 20px 0;padding:16px;border-radius:16px;background:linear-gradient(135deg,rgba(45,27,105,.5),rgba(201,168,76,.08));border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:space-between;}
+.upg-t h4{font-size:13px;color:var(--text);font-weight:600;}
+.upg-t p{font-size:10px;color:var(--t2);margin-top:3px;}
+.upg-btn{padding:10px 16px;border-radius:12px;border:none;background:var(--gg);color:#0D0D0D;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:0 4px 16px rgba(201,168,76,.3);}
+
+/* Scroll container helper */
+.scroll-box{overflow-y:auto;flex:1;scrollbar-width:none;padding-bottom:calc(var(--TH)+8px);}
+.scroll-box::-webkit-scrollbar{display:none;}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="sbar"><span>9:41</span><div class="sbar-icons"><span>▲▲▲</span><span>WiFi</span><span>⬛</span></div></div>
+  <div class="toast" id="toast"></div>
+
+  <!-- ═══ ONBOARDING FLOW ═══ -->
+
+  <!-- OB0: Splash -->
+  <div class="screen active fi" id="ob0">
+    <div class="ptcl" id="ptcl"></div>
+    <div class="halo"></div><div class="halo"></div><div class="halo"></div>
+    <div class="ob0-c">
+      <div class="ob0-ey">Who Do You Want To Be Today</div>
+      <div class="ob0-t">今天<br><em>你想</em><br>成为谁</div>
+      <div class="ob0-sub">沉浸式角色化时尚平台</div>
+      <div class="ob0-div"></div>
+      <div class="ob0-desc">AI数字化衣橱 · 影视级妆造指导<br>虚拟试衣间 · 一键变身礼包</div>
+      <button class="ob0-btn" onclick="goScreen('ob1')">开始变身</button>
+    </div>
+    <div class="ob0-ft">POWERED BY AI STYLING ENGINE</div>
+  </div>
+
+  <!-- OB1: Mirror Intro -->
+  <div class="screen" id="ob1">
+    <div class="ob1-rings"><div class="ob1-ring"></div><div class="ob1-ring"></div><div class="ob1-ring"></div></div>
+    <div class="ob1-content">
+      <div class="ob1-glyph">🪞</div>
+      <div class="ob1-badge">魔镜 · 骨相测试</div>
+      <div class="ob1-title">先认识你自己</div>
+      <div class="ob1-sub">骨相是你一切妆造的地基。<br>19道题，识别你独有的面部骨相类型，<br>让之后每一件单品和每一笔妆容都真正适合你。</div>
+      <div class="ob1-chips">
+        <span class="ob1-chip">骨相分析</span>
+        <span class="ob1-chip">色彩定制</span>
+        <span class="ob1-chip">禁忌清单</span>
+        <span class="ob1-chip">约3分钟</span>
+      </div>
+      <button class="ob1-btn" onclick="goScreen('obch')">探索我的骨相 →</button>
+      <div class="ob1-skip" onclick="skipToMain()">已测过，直接进入 →</div>
+    </div>
+  </div>
+
+  <!-- OBCH: CHOICE SCREEN -->
+  <div class="screen" id="obch">
+    <div class="obch-top">
+      <div class="obch-glyph">🪞</div>
+      <div class="obch-title">选择你的探索方式</div>
+      <div class="obch-sub">两种路径 · 同样精准</div>
+    </div>
+    <div class="obch-cards">
+      <div class="obch-card" onclick="startBoneTest()">
+        <div class="obch-card-tag classic">经典</div>
+        <div class="obch-card-ic">📝</div>
+        <div class="obch-card-name">做题测试</div>
+        <div class="obch-card-desc">19道骨相专业问题<br>深度识别面部特征<br>结果可分享小红书</div>
+        <div class="obch-card-badge">准确度 94%</div>
+      </div>
+      <div class="obch-card hl" onclick="startPhotoScan()">
+        <div class="obch-card-tag new">AI新</div>
+        <div class="obch-card-ic">📸</div>
+        <div class="obch-card-name">拍照扫描</div>
+        <div class="obch-card-desc">上传一张素颜正面照<br>AI自动分析骨相<br>30秒出结果</div>
+        <div class="obch-card-badge">快速 · 零门槛</div>
+      </div>
+    </div>
+    <div class="obch-hint">做题结果支持 <em>📕 分享小红书</em>，记录你的骨相报告</div>
+  </div>
+
+  <!-- OBS2: PHOTO UPLOAD -->
+  <div class="screen" id="obs2">
+    <div class="obs2-head">
+      <div class="obs2-title">上传你的照片</div>
+      <div class="obs2-sub">素颜 · 正面 · 光线充足</div>
+    </div>
+    <div class="obs2-grid-wrap">
+      <div class="obs2-grid-frame">
+        <div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div>
+        <div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div>
+        <div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div>
+      </div>
+      <div class="obs2-corner tl"></div><div class="obs2-corner tr"></div>
+      <div class="obs2-corner bl"></div><div class="obs2-corner br"></div>
+      <div class="obs2-scan-line"></div>
+      <div class="obs2-oval"></div>
+    </div>
+    <div class="obs2-tip">将脸部对齐椭圆框，保持表情自然</div>
+    <button class="obs2-btn" onclick="goScreen('obs3');startScanTimer()">开始扫描 →</button>
+    <div class="obs2-back" onclick="goScreen('obch')">← 返回选择</div>
+  </div>
+
+  <!-- OBS3: SCANNING -->
+  <div class="screen" id="obs3">
+    <div class="obs3-rings">
+      <div class="obs3-ring r1"></div><div class="obs3-ring r2"></div>
+      <div class="obs3-ring r3"></div><div class="obs3-ring r4"></div>
+      <div class="obs3-center"><div class="obs3-dot"></div></div>
+    </div>
+    <div class="obs3-label">分析中…</div>
+    <div class="obs3-steps">
+      <div class="obs3-step"><div class="obs3-step-dot"></div><span class="obs3-step-txt">骨相识别</span></div>
+      <div class="obs3-step"><div class="obs3-step-dot"></div><span class="obs3-step-txt">三庭五眼比例计算</span></div>
+      <div class="obs3-step"><div class="obs3-step-dot"></div><span class="obs3-step-txt">色彩底调匹配</span></div>
+      <div class="obs3-step"><div class="obs3-step-dot"></div><span class="obs3-step-txt">生成专属造型方案</span></div>
+    </div>
+  </div>
+
+  <!-- OB-QUIZ -->
+  <div class="screen" id="obq">
+    <div class="obq-top">
+      <div class="qback" onclick="quizBack()">←</div>
+      <div class="qprog">
+        <div class="qhead-row">
+          <span class="qcat-label" id="qcat-lbl">骨相分析</span>
+          <span class="qcounter" id="qcounter">1 / 19</span>
+        </div>
+        <div class="qprog-track"><div class="qprog-fill" id="qpfill"></div></div>
+      </div>
+    </div>
+    <div class="qcat" id="qcat"></div>
+    <div class="qqtext" id="qqtext"></div>
+    <div class="qhint" id="qhint"></div>
+    <div class="qopts" id="qopts"></div>
+  </div>
+
+  <!-- OB-CALC -->
+  <div class="screen" id="obc">
+    <div class="calc-rings">
+      <div class="cring"></div><div class="cring"></div><div class="cring"></div>
+      <div class="ccore">🪞</div>
+    </div>
+    <div class="calc-title">骨相识别中</div>
+    <div class="calc-sub">Analyzing Bone Structure</div>
+    <div class="calc-steps-list" id="csteps">
+      <div class="cstep"><div class="cdot"></div>面部轮廓特征提取</div>
+      <div class="cstep"><div class="cdot"></div>骨相类型矩阵匹配</div>
+      <div class="cstep"><div class="cdot"></div>色彩底调识别</div>
+      <div class="cstep"><div class="cdot"></div>专属妆造脚本生成</div>
+    </div>
+  </div>
+
+  <!-- OB-REVEAL -->
+  <div class="screen" id="obr">
+    <div class="obr-scroll">
+      <div class="obr-hero">
+        <div class="obr-top">
+          <div class="bone-no-b" id="obr-no">001</div>
+          <div class="bone-rar" id="obr-rar">TOP 8%</div>
+        </div>
+        <div class="bone-nm" id="obr-nm">清冷智性脸</div>
+        <div class="bone-tr" id="obr-tr">三庭比例均衡 · 颧骨立体</div>
+        <div class="celeb-card" id="obr-celeb">
+          <div class="celeb-av" id="obr-cav" style="background:linear-gradient(135deg,#1a2a4a,#4a2a8a);">🎬</div>
+          <div>
+            <div class="celeb-nm" id="obr-cnm">倪妮型</div>
+            <div class="celeb-en" id="obr-cen">Ice Intellect</div>
+            <div class="celeb-tr" id="obr-ctr">深邃眉骨 · 清冷锋芒</div>
+          </div>
+          <div class="celeb-mt"><div class="celeb-pct" id="obr-cpct">92%</div><div class="celeb-lbl">相似度</div></div>
+        </div>
+      </div>
+      <!-- Props -->
+      <div class="props-section">
+        <div class="sec-title">骨相指标</div>
+        <div id="obr-props"></div>
+      </div>
+      <!-- Insight -->
+      <div class="insight-box" id="obr-insight"></div>
+      <!-- Color profile -->
+      <div class="cpb" id="obr-cpb">
+        <div class="cpb-dot" id="obr-cpdot" style="background:#7aa0c8;"></div>
+        <div>
+          <div class="cpb-lbl" id="obr-cplbl">冷底调</div>
+          <div class="cpb-note" id="obr-cpnote">你的肤色偏冷...</div>
+        </div>
+      </div>
+      <!-- CTA -->
+      <div style="padding:0 20px;">
+        <button class="obr-cta" onclick="goToFreeLook()">查看我的专属造型 →</button>
+        <div class="obr-sub">已根据骨相为你生成 · 完全免费</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OBF: FREE LOOK REVEAL -->
+  <div class="screen" id="obf">
+    <div class="obf-bg"></div>
+    <div class="obf-content">
+      <div class="obf-tag">专属造型 · 免费解锁</div>
+      <div class="obf-visual" id="obf-vis">✨</div>
+      <div class="obf-role" id="obf-role">都市女主角</div>
+      <div class="obf-headline" id="obf-hl">今天，你是人群里最特别的那个</div>
+      <div class="obf-items" id="obf-items"></div>
+      <div class="obf-desc" id="obf-desc"></div>
+      <button class="obf-cta" onclick="shareResult()" style="background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.1);animation:none;box-shadow:none;margin-bottom:10px;">📕 分享到小红书</button>
+      <button class="obf-cta" onclick="goToMain()">探索更多造型 →</button>
+      <div class="obf-free-badge">已为你定制 · 完全免费</div>
+    </div>
+    <!-- Share Modal -->
+    <div class="share-overlay" id="share-overlay" onclick="closeShare(event)">
+      <div class="share-sheet">
+        <div class="share-handle"></div>
+        <div class="share-title">分享你的骨相报告</div>
+        <div class="share-card" id="share-card">
+          <div class="share-card-eyebrow">✦ 今天你想成为谁 · 骨相测试报告</div>
+          <div class="share-card-bone" id="sc-bone">清冷智性脸</div>
+          <div class="share-card-role" id="sc-role">都市女主角 · 专属造型已解锁</div>
+          <div class="share-card-pills" id="sc-pills"></div>
+          <div class="share-card-tag">📱 今天你想成为谁 · 骨相定制妆造</div>
+        </div>
+        <div class="share-hint">截图这张卡片 → 发布到小红书</div>
+        <div class="share-actions">
+          <button class="share-act-btn primary" onclick="copyShareText()">复制文案</button>
+          <button class="share-act-btn secondary" onclick="closeShare()">关闭</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN APP ═══ -->
+
+  <!-- S2: ROLE SELECT -->
+  <div class="screen" id="s2">
+    <div class="scroll-box">
+      <div class="s2-hd">
+        <div class="s2-hd-t"><h2>选择今日角色</h2><p>根据你的骨相，我们有推荐</p></div>
+      </div>
+      <div class="s2-sub">Today's Persona</div>
+      <!-- Bone match hint -->
+      <div class="bone-match-strip" id="bone-match-strip">
+        <span class="bms-icon">🪞</span>
+        <div class="bms-text">你的骨相 <strong id="bms-nm">清冷智性脸</strong> 更适合下方高亮角色</div>
+      </div>
+      <div style="height:12px;"></div>
+      <div class="role-scroll">
+        <div class="rcard" id="rc0" onclick="selectRole(0)">
+          <div class="rcard-art rc-city"><div class="re">🎬</div></div>
+          <div class="rcard-body">
+            <div class="rcard-nm">都市女主角</div><div class="rcard-en">City Protagonist</div>
+            <div class="rtags"><span class="rtag">知性</span><span class="rtag">干练</span><span class="rtag">高冷</span></div>
+            <button class="rsel-btn">选定角色</button>
+          </div>
+        </div>
+        <div class="rcard" id="rc1" onclick="selectRole(1)">
+          <div class="rcard-art rc-sweet"><div class="re">🌸</div></div>
+          <div class="rcard-body">
+            <div class="rcard-nm">甜系少女</div><div class="rcard-en">Sweet Fairy</div>
+            <div class="rtags"><span class="rtag">可爱</span><span class="rtag">梦幻</span><span class="rtag">清甜</span></div>
+            <button class="rsel-btn">选定角色</button>
+          </div>
+        </div>
+        <div class="rcard" id="rc2" onclick="selectRole(2)">
+          <div class="rcard-art rc-cyber"><div class="re">⚡</div></div>
+          <div class="rcard-body">
+            <div class="rcard-nm">赛博朋克</div><div class="rcard-en">Cyberpunk Queen</div>
+            <div class="rtags"><span class="rtag">未来感</span><span class="rtag">叛逆</span><span class="rtag">酷</span></div>
+            <button class="rsel-btn">选定角色</button>
+          </div>
+        </div>
+        <div class="rcard" id="rc3" onclick="selectRole(3)">
+          <div class="rcard-art rc-forest"><div class="re">🌿</div></div>
+          <div class="rcard-body">
+            <div class="rcard-nm">森系精灵</div><div class="rcard-en">Forest Elf</div>
+            <div class="rtags"><span class="rtag">自然</span><span class="rtag">神秘</span><span class="rtag">清冷</span></div>
+            <button class="rsel-btn">选定角色</button>
+          </div>
+        </div>
+        <div class="rcard" id="rc4" onclick="selectRole(4)">
+          <div class="rcard-art rc-retro"><div class="re">🔥</div></div>
+          <div class="rcard-body">
+            <div class="rcard-nm">复古女王</div><div class="rcard-en">Retro Queen</div>
+            <div class="rtags"><span class="rtag">复古</span><span class="rtag">华丽</span><span class="rtag">性感</span></div>
+            <button class="rsel-btn">选定角色</button>
+          </div>
+        </div>
+      </div>
+      <div class="role-tip">← 左右滑动探索更多 →</div>
+    </div>
+    <div class="tabbar">
+      <div class="ti on" onclick="goScreen('s2')"><div class="tic">🎭</div><div class="til">角色</div></div>
+      <div class="ti" onclick="goScreen('s3')"><div class="tic">👗</div><div class="til">衣橱</div></div>
+      <div class="ti" onclick="goScreen('s4')"><div class="tic">✨</div><div class="til">试衣间</div></div>
+      <div class="ti" onclick="goScreen('s5')"><div class="tic">💄</div><div class="til">妆造</div></div>
+      <div class="ti" onclick="goScreen('s7')"><div class="tic">👤</div><div class="til">我的</div></div>
+    </div>
+  </div>
+
+  <!-- S3: WARDROBE -->
+  <div class="screen" id="s3">
+    <div class="scroll-box">
+      <div class="ward-hd">
+        <div class="ward-role" id="ward-role">都市女主角的衣橱</div>
+        <div class="ward-title">我的数字衣橱</div>
+        <div class="ward-stats">
+          <div class="stat-chip"><div class="stat-n">47</div><div class="stat-l">件单品</div></div>
+          <div class="stat-chip"><div class="stat-n">12</div><div class="stat-l">套搭配</div></div>
+          <div class="stat-chip"><div class="stat-n">3</div><div class="stat-l">待归还</div></div>
+        </div>
+      </div>
+      <div class="srch"><span class="srch-ic">🔍</span><input class="srch-in" type="text" placeholder="搜索单品、风格、颜色..."></div>
+      <div class="ctabs">
+        <div class="ctab on" onclick="setCTab(this)">全部</div>
+        <div class="ctab" onclick="setCTab(this)">上衣</div>
+        <div class="ctab" onclick="setCTab(this)">下装</div>
+        <div class="ctab" onclick="setCTab(this)">外套</div>
+        <div class="ctab" onclick="setCTab(this)">配饰</div>
+      </div>
+      <div class="clothes-grid">
+        <div class="ci fav"><div class="cb cg1"><div class="cci">👔</div><div class="ccl">藏蓝西装</div></div></div>
+        <div class="ci"><div class="cb cg2"><div class="cci">👗</div><div class="ccl">紫色长裙</div></div></div>
+        <div class="ci"><div class="cb cg3"><div class="cci">🧥</div><div class="ccl">墨绿风衣</div></div></div>
+        <div class="ci fav"><div class="cb cg4"><div class="cci">👜</div><div class="ccl">驼色包</div></div></div>
+        <div class="ci"><div class="cb cg5"><div class="cci">🥻</div><div class="ccl">酒红旗袍</div></div></div>
+        <div class="ci"><div class="cb cg6"><div class="cci">👒</div><div class="ccl">海军帽</div></div></div>
+        <div class="ci fav"><div class="cb cg7"><div class="cci">🩱</div><div class="ccl">金色上衣</div></div></div>
+        <div class="ci"><div class="cb cg8"><div class="cci">👠</div><div class="ccl">玫红高跟</div></div></div>
+        <div class="ci"><div class="cb cg1"><div class="cci">🧣</div><div class="ccl">丝质围巾</div></div></div>
+        <div class="ci"><div class="cb cg3"><div class="cci">🩲</div><div class="ccl">格纹短裤</div></div></div>
+        <div class="ci fav"><div class="cb cg2"><div class="cci">💍</div><div class="ccl">珍珠项链</div></div></div>
+        <div class="ci"><div class="cb cg5"><div class="cci">🧤</div><div class="ccl">皮手套</div></div></div>
+      </div>
+      <div class="ai-ban" onclick="goScreen('s4')">
+        <div class="ai-ban-l">
+          <div class="ai-ban-ic">✨</div>
+          <div class="ai-ban-t"><h4>今日AI推荐搭配</h4><p>根据骨相精选 3 套造型方案</p></div>
+        </div>
+        <span style="font-size:16px;color:var(--gold);">›</span>
+      </div>
+    </div>
+    <div class="fab">＋</div>
+    <div class="tabbar">
+      <div class="ti" onclick="goScreen('s2')"><div class="tic">🎭</div><div class="til">角色</div></div>
+      <div class="ti on" onclick="goScreen('s3')"><div class="tic">👗</div><div class="til">衣橱</div></div>
+      <div class="ti" onclick="goScreen('s4')"><div class="tic">✨</div><div class="til">试衣间</div></div>
+      <div class="ti" onclick="goScreen('s5')"><div class="tic">💄</div><div class="til">妆造</div></div>
+      <div class="ti" onclick="goScreen('s7')"><div class="tic">👤</div><div class="til">我的</div></div>
+    </div>
+  </div>
+
+  <!-- S4: FITTING ROOM -->
+  <div class="screen" id="s4">
+    <div class="fit-hd">
+      <div><div class="fit-sub" id="fit-role">都市女主角</div><div class="fit-title">虚拟试衣间</div></div>
+      <div class="filter-tag">3D 模式</div>
+    </div>
+    <div class="fit-stage" onclick="toggleFilter()">
+      <div class="fbg n" id="fbg"></div>
+      <div class="filter-badge2" id="fbdg">🎬 影视滤镜</div>
+      <div class="pers">
+        <svg viewBox="0 0 100 200" class="psvg" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="50" cy="22" rx="16" ry="18"/>
+          <rect x="44" y="38" width="12" height="10" rx="4"/>
+          <path d="M20 50 Q50 44 80 50 L84 80 Q50 76 16 80 Z"/>
+          <path d="M22 78 Q50 74 78 78 L76 130 Q50 126 24 130 Z"/>
+          <path d="M26 128 Q50 124 74 128 L72 148 Q50 144 28 148 Z"/>
+          <path d="M28 146 L26 196 Q32 196 38 196 L40 146 Z"/>
+          <path d="M62 146 L60 196 Q66 196 72 196 L74 146 Z"/>
+          <path d="M20 52 L10 110 Q16 112 20 110 L30 56 Z"/>
+          <path d="M80 52 L90 110 Q86 112 82 110 L72 56 Z"/>
+        </svg>
+      </div>
+      <div class="picker">
+        <div class="pitm pi1 on" onclick="pickOut(this,event)"><div class="pii">👔</div><div class="pil">西装</div></div>
+        <div class="pitm pi2" onclick="pickOut(this,event)"><div class="pii">👗</div><div class="pil">长裙</div></div>
+        <div class="pitm pi3" onclick="pickOut(this,event)"><div class="pii">🧥</div><div class="pil">风衣</div></div>
+        <div class="pitm pi4" onclick="pickOut(this,event)"><div class="pii">🥻</div><div class="pil">旗袍</div></div>
+        <div class="pitm pi5" onclick="pickOut(this,event)"><div class="pii">🩱</div><div class="pil">上衣</div></div>
+        <div class="pitm pi6" onclick="pickOut(this,event)"><div class="pii">🩲</div><div class="pil">下装</div></div>
+      </div>
+      <div class="stg-hint">点击舞台切换影视滤镜</div>
+    </div>
+    <div class="fit-outfit">
+      <div class="fod-l">
+        <div class="fod-dot cg1" style="border-radius:8px;"></div>
+        <div><div class="fod-nm">藏蓝精纺西装</div><div class="fod-sub">租赁 · 归还 3月20日</div></div>
+      </div>
+      <div class="fod-p">¥38<span style="font-size:10px;color:var(--t3)">/天</span></div>
+    </div>
+    <div class="fit-acts">
+      <button class="fa-btn" onclick="toggleFilter()">🎬 影视滤镜</button>
+      <button class="fa-btn pri" onclick="goScreen('s5')">生成妆造方案</button>
+      <button class="fa-btn" onclick="goScreen('s6');showToast('✅ 已加入礼包')">加入礼包</button>
+    </div>
+    <div class="tabbar">
+      <div class="ti" onclick="goScreen('s2')"><div class="tic">🎭</div><div class="til">角色</div></div>
+      <div class="ti" onclick="goScreen('s3')"><div class="tic">👗</div><div class="til">衣橱</div></div>
+      <div class="ti on" onclick="goScreen('s4')"><div class="tic">✨</div><div class="til">试衣间</div></div>
+      <div class="ti" onclick="goScreen('s5')"><div class="tic">💄</div><div class="til">妆造</div></div>
+      <div class="ti" onclick="goScreen('s7')"><div class="tic">👤</div><div class="til">我的</div></div>
+    </div>
+  </div>
+
+  <!-- S5: 骨相妆造报告 -->
+  <div class="screen" id="s5">
+    <!-- State: No test (entry) -->
+    <div class="s5-st on" id="s5e">
+      <div class="scroll-box">
+        <div class="s5e-hd">
+          <div class="s5e-ey">Styling Intelligence</div>
+          <div class="s5e-title">骨相妆造系统</div>
+        </div>
+        <div class="mir-card" onclick="goScreen('ob1')">
+          <div class="mir-art"><div class="mir-glyph">🪞</div></div>
+          <div class="mir-body">
+            <div class="mir-bdg">魔镜 · 骨相测试</div>
+            <h3>用骨相定义你的妆容</h3>
+            <p>19道题识别你的骨相类型，解锁专属色卡、妆造步骤与禁忌清单。</p>
+            <div class="mir-feats">
+              <span class="mir-feat">6种骨相</span>
+              <span class="mir-feat">冷暖底调</span>
+              <span class="mir-feat">禁忌清单</span>
+            </div>
+            <button class="mir-btn">开始骨相测试 →</button>
+          </div>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="ti" onclick="goScreen('s2')"><div class="tic">🎭</div><div class="til">角色</div></div>
+        <div class="ti" onclick="goScreen('s3')"><div class="tic">👗</div><div class="til">衣橱</div></div>
+        <div class="ti" onclick="goScreen('s4')"><div class="tic">✨</div><div class="til">试衣间</div></div>
+        <div class="ti on" onclick="goScreen('s5')"><div class="tic">💄</div><div class="til">妆造</div></div>
+        <div class="ti" onclick="goScreen('s7')"><div class="tic">👤</div><div class="til">我的</div></div>
+      </div>
+    </div>
+    <!-- State: Result -->
+    <div class="s5-st" id="s5r">
+      <div class="s5r-scroll">
+        <div class="s5r-hero">
+          <div class="s5r-top">
+            <div class="bone-no-b" id="s5r-no">001</div>
+            <div class="bone-rar" id="s5r-rar">TOP 8%</div>
+          </div>
+          <div class="s5r-nm" id="s5r-nm">清冷智性脸</div>
+          <div class="s5r-tr" id="s5r-tr">三庭均衡 · 颧骨立体</div>
+        </div>
+        <div class="cpb" id="s5r-cpb">
+          <div class="cpb-dot" id="s5r-cpdot" style="background:#7aa0c8;"></div>
+          <div>
+            <div class="cpb-lbl" id="s5r-cplbl">冷底调</div>
+            <div class="cpb-note" id="s5r-cpnote"></div>
+          </div>
+        </div>
+        <div class="rtabs">
+          <div class="rtab on" onclick="setRTab(0,this)">专属色卡</div>
+          <div class="rtab" onclick="setRTab(1,this)">妆造步骤</div>
+          <div class="rtab" onclick="setRTab(2,this)">避雷清单</div>
+        </div>
+        <div class="rpanel on" id="rp0"><div id="sw-content"></div></div>
+        <div class="rpanel" id="rp1"><div id="gd-content"></div></div>
+        <div class="rpanel" id="rp2">
+          <div class="fbd-head"><span>⚠️</span>以下妆造方式会削弱你的骨相优势</div>
+          <div class="fbd-list" id="fbd-content"></div>
+        </div>
+        <div class="s5r-cta" onclick="goScreen('s6')">
+          <div class="s5r-cta-t"><h4>一键获取完整变身礼包</h4><p id="s5r-cta-sub">骨相专属色号 · 单品 · 造型师点评</p></div>
+          <div class="s5r-cta-ic">→</div>
+        </div>
+        <button class="retake-btn" onclick="retake()">🔄 重新测试骨相</button>
+        <div style="height:12px;"></div>
+      </div>
+      <div class="tabbar">
+        <div class="ti" onclick="goScreen('s2')"><div class="tic">🎭</div><div class="til">角色</div></div>
+        <div class="ti" onclick="goScreen('s3')"><div class="tic">👗</div><div class="til">衣橱</div></div>
+        <div class="ti" onclick="goScreen('s4')"><div class="tic">✨</div><div class="til">试衣间</div></div>
+        <div class="ti on" onclick="goScreen('s5')"><div class="tic">💄</div><div class="til">妆造</div></div>
+        <div class="ti" onclick="goScreen('s7')"><div class="tic">👤</div><div class="til">我的</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S6: PACKAGE -->
+  <div class="screen" id="s6">
+    <div class="scroll-box">
+      <div class="pkg-hd">
+        <div class="pkg-ey">你已爱上这个造型 · 现在拥有它</div>
+        <div class="pkg-ti" id="pkg-ti">都市女主角 · 变身礼包</div>
+      </div>
+      <div class="pkg-hero"><div class="phe-ic">🎁</div><div class="phe-t"><h3>完整变身礼包</h3><p>租 · 买 · 赠 三合一，一键真实呈现</p></div><div class="phe-bdg">限时优惠</div></div>
+      <div class="ps-sec">
+        <div class="ps-hd"><div class="ps-ic ir">🏷️</div><div class="ps-tl">租 · 高端单品</div><div class="ps-tag tr">低门槛</div></div>
+        <div class="pitms">
+          <div class="pitm2"><div class="pth cg1" style="border-radius:10px;">👔</div><div class="pin"><h5>Armani 藏蓝精纺西装</h5><p>M · 干洗归还 · 含变身保险</p></div><div class="pp"><span class="pn">¥38</span><span style="font-size:9px">/天</span></div></div>
+          <div class="pitm2"><div class="pth cg2" style="border-radius:10px;">👑</div><div class="pin"><h5>施华洛世奇水晶发冠</h5><p>银色 · 限量款</p></div><div class="pp"><span class="pn">¥25</span><span style="font-size:9px">/天</span></div></div>
+        </div>
+      </div>
+      <hr class="pkg-div">
+      <div class="ps-sec">
+        <div class="ps-hd"><div class="ps-ic ib">🛒</div><div class="ps-tl">买 · 骨相专属配饰</div><div class="ps-tag tb">自留款</div></div>
+        <div class="pitms">
+          <div class="pitm2"><div class="pth" style="background:linear-gradient(135deg,#8B3A52,#c96a82);border-radius:10px;">💄</div><div class="pin"><h5>骨相推荐 · 哑光口红</h5><p id="lip-desc">冷调正红 · 骨相必胜色</p></div><div class="pp"><span class="pn">¥89</span></div></div>
+          <div class="pitm2"><div class="pth" style="background:linear-gradient(135deg,#2d3a5a,#4a5a8a);border-radius:10px;">🕶️</div><div class="pin"><h5>猫眼墨镜</h5><p>复古金框 · UV400</p></div><div class="pp"><span class="pn">¥128</span></div></div>
+          <div class="pitm2"><div class="pth" style="background:linear-gradient(135deg,#3d2800,#7c5200);border-radius:10px;">🧴</div><div class="pin"><h5>角色场景香水小样</h5><p>10ml · 限定款</p></div><div class="pp"><span class="pn">¥58</span></div></div>
+        </div>
+      </div>
+      <hr class="pkg-div">
+      <div class="ps-sec">
+        <div class="ps-hd"><div class="ps-ic ig">🎁</div><div class="ps-tl">赠 · 专属数字增值</div><div class="ps-tag tg">赠品</div></div>
+        <div class="pitms">
+          <div class="pitm2"><div class="pth" style="background:linear-gradient(135deg,#1a0a2a,#4a1a7c);border-radius:10px;">✨</div><div class="pin"><h5>影视滤镜包（5款）</h5><p>永久解锁</p></div><div class="pp" style="color:var(--gold);">赠品</div></div>
+          <div class="pitm2"><div class="pth" style="background:linear-gradient(135deg,#0a1a2a,#1a3a5a);border-radius:10px;">📋</div><div class="pin"><h5>造型师在线点评 30min</h5><p>1对1视频指导</p></div><div class="pp" style="color:var(--gold);">赠品</div></div>
+        </div>
+      </div>
+      <hr class="pkg-div">
+      <div class="price-box">
+        <div class="pr-row"><span class="pr-l">租赁费用（3天）</span><span class="pr-v">¥189</span></div>
+        <div class="pr-row"><span class="pr-l">配饰美妆</span><span class="pr-v">¥275</span></div>
+        <div class="pr-row"><span class="pr-l">赠品价值</span><span class="pr-v" style="color:var(--gold)">¥580</span></div>
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,.05);margin:10px 0;">
+        <div class="pr-row tot"><span class="pr-l">礼包总价</span><span class="pr-v"><span>¥</span>268</span></div>
+        <div class="pr-save">已节省 ¥776，立省 74%</div>
+      </div>
+      <button class="buy-btn" onclick="showToast('🎉 变身成功！订单已创建')">立即变身 ✦</button>
+      <div class="buy-ft">已有 2,847 人选择了这个角色 · 变身保险已包含</div>
+    </div>
+    <div class="tabbar">
+      <div class="ti" onclick="goScreen('s2')"><div class="tic">🎭</div><div class="til">角色</div></div>
+      <div class="ti" onclick="goScreen('s3')"><div class="tic">👗</div><div class="til">衣橱</div></div>
+      <div class="ti" onclick="goScreen('s4')"><div class="tic">✨</div><div class="til">试衣间</div></div>
+      <div class="ti" onclick="goScreen('s5')"><div class="tic">💄</div><div class="til">妆造</div></div>
+      <div class="ti" onclick="goScreen('s7')"><div class="tic">👤</div><div class="til">我的</div></div>
+    </div>
+  </div>
+
+  <!-- S7: MEMBER -->
+  <div class="screen" id="s7">
+    <div class="scroll-box">
+      <div class="uc">
+        <div class="uav">🌟</div>
+        <div class="uin"><div class="unm">Julia·羽翎</div><div class="uid">ID · 88102347</div><div style="margin-top:6px;"><span class="ubadge">✦ 黄金会员</span></div></div>
+        <div class="ulv"><div class="ulvn">LV.4</div><div class="ulvl">GOLD TIER</div></div>
+      </div>
+      <div style="padding:0 20px 12px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:10px;color:var(--t3)">升级进度至铂金</span><span style="font-size:10px;color:var(--gold)">2,340 / 5,000 积分</span></div>
+        <div style="height:4px;background:var(--b4);border-radius:4px;overflow:hidden;"><div style="width:47%;height:100%;background:var(--gg);border-radius:4px;"></div></div>
+      </div>
+      <!-- Bone type badge in profile -->
+      <div id="s7-bone-strip" style="display:none;margin:0 20px 12px;padding:10px 14px;border-radius:12px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="goScreen('s5')">
+        <span style="font-size:18px;">🪞</span>
+        <div><div style="font-size:12px;color:var(--text);font-weight:600;" id="s7-bone-nm">骨相未测试</div><div style="font-size:10px;color:var(--t2);margin-top:1px;">点击查看专属妆造报告</div></div>
+        <span style="margin-left:auto;color:var(--gold);font-size:14px;">›</span>
+      </div>
+      <div class="mem-st">会员专属权益</div>
+      <div class="bens">
+        <div class="ben"><div class="ben-ic bic1">🤖</div><div class="ben-t"><h4>深度AI衣橱管理报告</h4><p>每月专属分析报告，优化穿搭利用率</p></div><div class="ben-ar">›</div></div>
+        <div class="ben"><div class="ben-ic bic2">💅</div><div class="ben-t"><h4>造型师优先预约通道</h4><p>1对1连线指导，专业造型师实时解答</p></div><div class="ben-ar">›</div></div>
+        <div class="ben"><div class="ben-ic bic3">✨</div><div class="ben-t"><h4>无限虚拟滤镜解锁</h4><p>所有影视级滤镜无限使用</p></div><div class="ben-ar">›</div></div>
+      </div>
+      <div class="mem-st" style="margin-top:16px;">我的订单</div>
+      <div class="ord-tabs">
+        <div class="ord-tab on" onclick="setOrdTab(this)">进行中</div>
+        <div class="ord-tab" onclick="setOrdTab(this)">已完成</div>
+        <div class="ord-tab" onclick="setOrdTab(this)">待归还</div>
+      </div>
+      <div class="ord-list">
+        <div class="ord-c"><div class="ord-th cg1" style="border-radius:10px;">👔</div><div class="ord-in"><h5>都市女主角变身礼包</h5><p>2026.03.14 · 租期至 3月17日</p></div><div class="ord-st ost-a">进行中</div></div>
+        <div class="ord-c"><div class="ord-th cg5" style="border-radius:10px;">🔥</div><div class="ord-in"><h5>复古女王 · 特别造型</h5><p>2026.02.28 · 已完成</p></div><div class="ord-st ost-d">已完成</div></div>
+      </div>
+      <div class="upg-c"><div class="upg-t"><h4>升级至铂金会员</h4><p>专属折扣 · 月度赠品礼包 · VIP客服</p></div><button class="upg-btn" onclick="showToast('🌟 升级页面即将开放')">立即升级</button></div>
+    </div>
+    <div class="tabbar">
+      <div class="ti" onclick="goScreen('s2')"><div class="tic">🎭</div><div class="til">角色</div></div>
+      <div class="ti" onclick="goScreen('s3')"><div class="tic">👗</div><div class="til">衣橱</div></div>
+      <div class="ti" onclick="goScreen('s4')"><div class="tic">✨</div><div class="til">试衣间</div></div>
+      <div class="ti" onclick="goScreen('s5')"><div class="tic">💄</div><div class="til">妆造</div></div>
+      <div class="ti on" onclick="goScreen('s7')"><div class="tic">👤</div><div class="til">我的</div></div>
+    </div>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+/* ══════════════════════════════════════════
+   FREE LOOK DATA — one signature look per bone type
+══════════════════════════════════════════ */
+const FREE_LOOK={
+  QC:{role:'都市女主角',headline:'今天，你是人群里\n最特别的那个',vis:'🎬',
+    items:[{ic:'眼',name:'烟灰蓝眼影',desc:'骨相加分必杀技'},
+           {ic:'唇',name:'冷玫瑰哑光唇',desc:'清冷智性的标志色'},
+           {ic:'装',name:'极简黑白剪裁',desc:'三庭均衡的完美框架'}],
+    desc:'你的骨相天生适合高级感造型。这套让你秒变都市精英女主——不需要任何滤镜。'},
+  NY:{role:'东方遗珠',headline:'你骨子里藏着\n千年的温柔',vis:'🌸',
+    items:[{ic:'眼',name:'琥珀棕渐层眼影',desc:'暖融融的东方眼神'},
+           {ic:'唇',name:'豆沙裸唇',desc:'含蓄又致命的美'},
+           {ic:'装',name:'改良汉服流水裙摆',desc:'暖柔骨相的天选搭配'}],
+    desc:'你的骨相柔和而有层次。东方古典造型会让你美得令人窒息，每一帧都是画。'},
+  SG:{role:'初恋女主角',headline:'有人说你笑起来\n像整个春天',vis:'🌷',
+    items:[{ic:'眼',name:'裸粉珠光眼影',desc:'清透灵动的少女感'},
+           {ic:'唇',name:'珊瑚橘唇蜜',desc:'水润饱满·看一眼忘不掉'},
+           {ic:'装',name:'碎花针织叠穿',desc:'少女感骨相的完美呈现'}],
+    desc:'你的骨相自带清透光芒。这套造型会让所有人以为你是在拍偶像剧——因为你本就是主角。'},
+  YJ:{role:'御姐本姐',headline:'你走进来，\n整个房间都回头',vis:'👑',
+    items:[{ic:'眼',name:'深咖大地眼影',desc:'棱角骨相的力量感'},
+           {ic:'唇',name:'正红哑光口红',desc:'御姐必胜·压制全场'},
+           {ic:'装',name:'黑色权力西装',desc:'凌厉骨相的天然战袍'}],
+    desc:'你的骨相有天然的威仪感。这套造型会让你感受到什么叫"她来了"——全场聚焦，无需开口。'},
+  JL:{role:'空灵仙子',headline:'有一种美，\n不像真实世界的人',vis:'✨',
+    items:[{ic:'眼',name:'薄荷绿珠光细闪',desc:'精灵骨相的灵气加成'},
+           {ic:'唇',name:'樱花粉唇釉',desc:'空灵仙气·无可替代'},
+           {ic:'装',name:'飘逸仙鹤白长裙',desc:'精灵骨相的最强载体'}],
+    desc:'你的骨相有种超凡脱俗的气质，普通造型容纳不下你。这套会让你美出现实感。'},
+  TX:{role:'奶糖女孩',headline:'你一笑，\n全世界都软了',vis:'🍬',
+    items:[{ic:'眼',name:'粉橘晕染眼影',desc:'甜系骨相的萌点放大'},
+           {ic:'唇',name:'水蜜桃透明唇釉',desc:'甜而不腻·刚刚好'},
+           {ic:'装',name:'粉色泡泡袖连衣裙',desc:'甜系骨相的专属战袍'}],
+    desc:'你的骨相有让人无法抵抗的甜度。今天这套造型会让你甜到让人想保护你。'}
+};
+
+/* ══════════════════════════════════════════
+   BONE TEST DATA (19 questions, new version)
+══════════════════════════════════════════ */
+const QUESTIONS=[
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'对镜观察，你的三庭哪段最短？',hint:'上庭：发际线→眉头 / 中庭：眉头→鼻尖 / 下庭：鼻尖→下巴',
+   opts:['上庭最短——额头不高，发际线靠下','上庭偏长——额头高，发际线明显偏高','中庭最短——眉眼鼻集中在面部中央','下庭最短——嘴和下巴离鼻子较近','三庭比例均衡，没有哪段特别短'],
+   sc:[{TX:2,SG:1},{JL:3,NY:1},{NY:2,SG:2},{TX:3,SG:2},{QC:4,YJ:2,JL:1}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'太阳穴区域（颞部）是否饱满？',hint:'额头两侧、眉梢与发际之间的区域。正面看是否有凹陷感？',
+   opts:['饱满圆润——额头到颧骨过渡流畅，无凹陷','轻微凹陷——整体仍流畅，略有起伏','明显凹陷——颞骨形态清晰可见，骨感强'],
+   sc:[{JL:3,TX:2,SG:1},{QC:2,YJ:1},{NY:2,YJ:2}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'闭眼放松——眼窝是否有自然凹陷或阴影感？',hint:'不化妆状态下看上眼皮区域。眶骨是否将眼皮"托"出一个深邃的凹陷区？',
+   opts:['明显——有天然深邃感，眼皮区存在清晰阴影','轻微——有一点层次感，需仔细看才出现','几乎没有——眼皮饱满平整，无凹陷感'],
+   sc:[{NY:5},{QC:3,JL:2},{SG:2,TX:3}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'用手指轻压眉头下方——眉骨是否有明显突起？',hint:'眉弓骨是额骨下缘的骨性凸起，清晰的眉骨带来折叠感和立体度。',
+   opts:['明显——眉弓骨感清晰，侧脸有清楚的折叠层次','轻微——能感觉到骨点，但不突出','没有——额头到眼眶过渡平滑，完全无凸起'],
+   sc:[{QC:4,NY:2},{YJ:2,JL:2},{SG:2,TX:2}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'不化妆放松状态，你的眼型更接近？',hint:'看眼睛整体形状，不考虑大小',
+   opts:['杏眼——细长，眼尾轻微上扬，有折叠感','修长眼——眼型窄长，眼尾偏平直甚至微下垂','水润感——眼皮饱满有肉感，明亮但不特别圆','圆眼——眼白比例高，眼神饱满明亮','深邃感——眼眶骨感强，有自然双层叠影','精致小眼——眼睛不大，但眼神清澈有神'],
+   sc:[{QC:4},{YJ:4,QC:1},{SG:4},{TX:4},{NY:4},{JL:4}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'两眼内眼角之间的距离（眼距）？',hint:'参考：一根手指横放的宽度约等于标准一只眼睛的宽度',
+   opts:['偏近——内眼角间距小于一只眼宽','标准——约等于一只眼宽度','偏宽——间距明显大于一只眼宽'],
+   sc:[{NY:3,QC:1},{QC:3,YJ:1},{SG:2,TX:2,JL:2}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'侧脸时，颧骨骨峰偏向哪个方向突出？',hint:'颧骨是脸中部可触摸到的骨性突起',
+   opts:['向外侧扩张——正面看脸显宽，有蝴蝶骨感','向前斜上方突起——侧脸立体，有明显骨峰感','颧骨偏高——紧贴眼眶下缘，有提升感','颧骨不突出——侧脸偏平，骨峰不明显'],
+   sc:[{YJ:3,NY:1},{NY:3,QC:2},{QC:2,JL:2},{SG:1,TX:1}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'鼻梁高度与形态？',hint:'从眉间（山根）到鼻尖的整体形态感',
+   opts:['鼻梁很高——山根深邃，鼻骨在眉间就已挺起','鼻梁适中——有流畅弧度，不高不低','鼻梁偏低——整体偏平，山根不突出'],
+   sc:[{NY:4,QC:1},{QC:2,YJ:2,JL:2},{SG:2,TX:2}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'鼻头的形状与质感？',hint:'看鼻尖和鼻翼区域的形状',
+   opts:['圆润肉感——鼻头偏大，鼻翼较宽，有圆头感','尖细精致——鼻头小，鼻翼收敛','适中挺拔——不圆不尖，鼻翼比例正常，有骨感'],
+   sc:[{TX:3,SG:2},{JL:3,QC:2},{NY:2,YJ:2}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'人中长度——鼻尖到上唇之间的距离？',hint:'感受鼻子底部到嘴唇上缘的距离',
+   opts:['短——鼻子与嘴唇很近，有幼态紧凑感','标准——不近不远，长度适中','长——鼻尖到嘴唇距离明显偏长'],
+   sc:[{TX:4,SG:2},{QC:2,NY:1},{JL:3,YJ:1}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'人中沟的深浅与清晰度？',hint:'鼻尖下方那两条竖向凹槽',
+   opts:['深且窄——人中沟清晰，唇峰由此上翘成型','浅平——不明显，鼻底到上唇过渡柔和圆润'],
+   sc:[{NY:3,QC:2,JL:2},{SG:3,TX:3}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'嘴唇厚度？',hint:'上唇和下唇的整体丰薄感',
+   opts:['薄唇——上下唇都偏薄，线条感强','适中——丰薄均衡，不厚不薄','丰润——上唇或下唇明显饱满厚实'],
+   sc:[{QC:3,YJ:2,JL:1},{NY:2,QC:1,YJ:1},{SG:3,TX:3}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'唇峰（上唇正中两个高点）的清晰度？',hint:'上唇中央形成的弓形——是否有清晰的两个峰？',
+   opts:['唇峰高而清晰——M形明显，线条感强','唇峰适中——有弧度但不极端','唇峰平缓——圆弧感强，边界柔和，几乎无M形'],
+   sc:[{NY:3,JL:2,QC:1},{YJ:2,QC:1},{SG:3,TX:3}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'正面看，你的下巴形状？',hint:'',
+   opts:['尖细——有明显的锥形收尾','微尖——不宽也不方，轮廓分明','偏方或平——有棱角感，下巴不收尖','圆润饱满——下巴不明显，有柔和肉感'],
+   sc:[{JL:4,QC:2},{QC:2,NY:1},{YJ:4},{SG:4,TX:1}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'侧脸时，从耳垂到下巴的下颌骨线条？',hint:'侧脸角度观察最清晰',
+   opts:['锐利清晰——线条感强，骨感一眼可见','有弧度——骨感存在，但以柔和弧线呈现','圆润柔和——轮廓感不强，边界模糊'],
+   sc:[{YJ:4,QC:2},{NY:2,JL:2,QC:1},{SG:2,TX:2}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'正面看，脸最宽的横向区域在哪里？',hint:'对比额头 · 颧骨 · 下颌三个横向宽度',
+   opts:['颧骨区最宽，向上向下都明显收窄','额头最宽，向下逐渐收窄（心形感）','下颌/脸颊圆润，下半脸最饱满','三处宽度差不多，没有明显最宽点'],
+   sc:[{NY:2,YJ:2},{JL:2,QC:1},{SG:2,TX:2},{QC:3,YJ:1}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'面部纵横比——发际到下巴 vs 两颊最宽处？',hint:'发际线到下巴的距离 对比 两颊最宽处的距离',
+   opts:['脸偏长——竖向感明显','接近圆形——长宽几乎相等','均衡比例——不偏长也不偏圆','偏宽扁——横向感更强'],
+   sc:[{JL:3,QC:2},{SG:3,TX:2},{QC:3,YJ:1},{YJ:2,NY:2}]},
+  {g:'color',cat:'Color Profile · 色彩定制',catL:'色彩定制',q:'自然光下，手腕内侧血管颜色偏？',hint:'这是判断肤色冷暖底调最客观的指标，光线要充足',
+   opts:['蓝色或紫色','绿色','蓝绿都有，难以分辨'],
+   color:['cool','warm','neutral']},
+  {g:'color',cat:'Color Profile · 色彩定制',catL:'色彩定制',q:'你的整体肤色调性？',hint:'',
+   opts:['冷白 / 粉白（皮肤有粉调或蓝调）','自然白 / 象牙白（不偏冷不偏暖）','暖米 / 黄白（皮肤偏黄或金调）','健康小麦 / 深肤（暖调明显）'],
+   color:['cool','neutral','warm','warm']},
+];
+
+const TYPES={
+  QC:{name:'清冷智性脸',no:'001',traits:'三庭比例均衡 · 颧骨立体 · 眉骨有力度',rarity:'TOP 8%',accent:'#c9a96e',
+    celeb:{name:'倪妮型',en:'Ice Intellect',trait:'深邃眉骨 · 清冷锋芒',match:'92%',bg:'linear-gradient(135deg,#1a2a4a,#4a2a8a)',ic:'🎬'},
+    props:[{l:'三庭均衡度',s:'9.0',p:90},{l:'五眼比例',s:'8.2',p:82},{l:'颧骨高度',s:'8.8',p:88},{l:'面部折叠度',s:'7.5',p:75},{l:'下庭比例',s:'7.0',p:70}],
+    insight:'你的<strong>上庭与中庭比例接近黄金法则</strong>，天然具备高级感的视觉基础。下庭略短是清冷感偶尔被削弱的原因——<strong>用修容强化下颌线</strong>可修正此比例。',
+    colorGroups:[
+      {t:'Eye Shadow · 眼影',sw:[['#9e8070','玫瑰棕',1],['#7a8a90','烟灰蓝',1],['#a09070','香槟金',0],['#6a7060','橄榄灰',0],['#d4c8b0','珍珠白',0]],tip:'推荐以<strong>烟灰蓝 + 玫瑰棕</strong>叠色，内眼角点珍珠白提亮，强化清冷凌厉感。',av:['#e06030','#e08840'],avl:'橘调系'},
+      {t:'Lip · 口红',sw:[['#8b3a42','冷调正红',1],['#7a4050','暗玫红',1],['#c08070','豆沙裸',0],['#6a3030','枫叶红',0]],tip:'<strong>冷调正红与暗玫红</strong>是你的必胜色；避免橘调口红稀释骨相清冷感。',av:['#e06030','#e08840'],avl:'橘调系'},
+      {t:'Blush · 腮红',sw:[['#c49090','冷粉',1],['#b88880','裸玫',0],['#9090a0','丁香紫',0]],tip:'腮红打在<strong>颧骨外侧斜扫</strong>，强调骨感而非可爱。'}],
+    guide:[{ic:'眉',tt:'眉形上扬，强化峰角',desc:'眉头与眼头对齐，眉峰<strong>上扬至眼尾外上方</strong>，拉长眉峰转角。平眉切忌。'},{ic:'骨',tt:'额结节高光，增加折叠度',desc:'高光集中于<strong>额头中央突出点</strong>，不要大面积涂抹，点状提亮制造骨相立体感。'},{ic:'廓',tt:'颧弓下线收缩，下颌线强化',desc:'收缩色沿<strong>颧弓下线斜向内扫</strong>，下颌线内侧补深色修容，放大清冷压迫感。'},{ic:'眼',tt:'眼线拉长，眼影清淡',desc:'眼线<strong>向外眼尾拉长3-4mm</strong>，线条清晰；眼影保持清淡融合感，以线制胜。'}],
+    forbid:['圆形眉','橘调口红','圆形腮红','珠光大眼影','平眉画法','散粉过白底妆'],
+    roleRec:[0,3], lipDesc:'冷调正红 · 骨相必胜色'},
+  NY:{name:'浓颜异域脸',no:'002',traits:'眼眶深邃 · 五官立体集中 · 颧骨高挑',rarity:'TOP 12%',accent:'#c4773a',
+    celeb:{name:'迪丽热巴型',en:'Deep Exotic',trait:'深邃眼眶 · 天然戏剧感',match:'91%',bg:'linear-gradient(135deg,#2a1a0a,#7c3a0a)',ic:'🌟'},
+    props:[{l:'五官立体度',s:'9.2',p:92},{l:'颧骨高度',s:'9.5',p:95},{l:'眼眶深邃度',s:'8.8',p:88},{l:'中庭集中度',s:'8.5',p:85},{l:'眼距比例',s:'6.8',p:68}],
+    insight:'你的<strong>五官高度集中于中庭</strong>，天然制造戏剧张力与视觉冲击力。眼距偏近——<strong>内眼角留白，眼尾向外延伸</strong>，将浓郁感升华为高级骨相感。',
+    colorGroups:[
+      {t:'Eye Shadow · 眼影',sw:[['#c4773a','铜棕',1],['#9b3a2a','赤陶',1],['#7a4a30','暖咖',0],['#3d1f14','深棕',0],['#c4856a','玫瑰金',0]],tip:'推荐以<strong>铜棕 + 赤陶</strong>叠晕烟熏，眼头点玫瑰金提亮，强化深邃戏剧感。',av:['#909090','#c0c0c0'],avl:'灰调/冷银系'},
+      {t:'Lip · 口红',sw:[['#8b2a2a','砖红',1],['#6b1e2a','酒红',1],['#5a1a20','枣红',0],['#7a4040','玫瑰棕',0]],tip:'<strong>砖红与酒红</strong>是你的必胜色；裸色唇会让五官显苍白失去张力。',av:['#e0a080','#f0c8b0'],avl:'裸色/冷粉系'},
+      {t:'Blush · 腮红',sw:[['#b05030','赤陶',1],['#c06848','暖桃砖',0],['#a04028','砖橘',0]],tip:'腮红沿<strong>颧骨斜线向内扫</strong>，强调立体轮廓，不要圆形涂抹。'}],
+    guide:[{ic:'眉',tt:'保留自然厚度，眉峰微上扬',desc:'眉形保持天然厚实感，眉峰<strong>微微上扬</strong>，用走势区分日常气场与戏剧气场。细眉会破坏浓颜平衡。'},{ic:'眼',tt:'内眼角留白，眼尾延伸拉宽',desc:'<strong>内眼角提亮留白</strong>，视觉拉宽眼距；眼线从眼中段加粗，眼尾向外延伸。'},{ic:'骨',tt:'鼻梁细高光，强化立体中轴',desc:'高光集中于<strong>鼻梁中段一条细线</strong>，垂直提亮强化面部中轴线，不要横向扩散。'},{ic:'廓',tt:'颧骨下线暖棕修容，收紧面部',desc:'修容用<strong>暖棕色沿颧骨下线斜向内扫</strong>，避免灰棕色（显脏），暖调修容更自然。'}],
+    forbid:['灰调眼影','裸色唇','圆形腮红','细平眉','冷粉系','过白底妆'],
+    roleRec:[0,4], lipDesc:'砖红/酒红 · 必胜戏剧色'},
+  SG:{name:'水光幼态脸',no:'003',traits:'圆润轮廓 · 眼距略宽 · 下庭饱满',rarity:'TOP 18%',accent:'#c4788a',
+    celeb:{name:'关晓彤型',en:'Soft Glow',trait:'圆润脸型 · 水光肌感',match:'88%',bg:'linear-gradient(135deg,#2a0a1a,#7c2a5a)',ic:'🌸'},
+    props:[{l:'下庭饱满度',s:'9.1',p:91},{l:'面部水润感',s:'9.0',p:90},{l:'眼距开阔度',s:'8.8',p:88},{l:'轮廓圆润度',s:'8.6',p:86},{l:'三庭均衡度',s:'7.4',p:74}],
+    insight:'你的<strong>下庭饱满、眼距开阔</strong>是天然的减龄资本，比任何后天努力都有效。三庭均衡度略低——<strong>强化中庭精致感</strong>是关键，保留幼态的同时提升层次。',
+    colorGroups:[
+      {t:'Eye Shadow · 眼影',sw:[['#e8a0a8','腮粉',1],['#c4957a','奶茶棕',1],['#d4788a','玫瑰粉',0],['#e8d8c0','香草米',0],['#f0e8e0','珠光白',0]],tip:'推荐<strong>腮粉 + 奶茶棕</strong>晕染下眼睑，内眼角点珠光白，制造水润圆眼效果。',av:['#3d2810','#606060'],avl:'深大地/烟熏系'},
+      {t:'Lip · 口红',sw:[['#e89090','水粉红',1],['#e08070','珊瑚橘',1],['#c47878','豆沙',0],['#d4a090','裸粉',0]],tip:'<strong>水粉红与珊瑚橘</strong>最能激活水润感；深色唇会压重整体轻盈气质。',av:['#6b1e2a','#3d1010'],avl:'深酒红/枣红系'},
+      {t:'Blush · 腮红',sw:[['#f0a8b0','嫩粉',1],['#f0b890','水蜜桃',0],['#e8a090','蜜桃橘',0]],tip:'腮红打在<strong>苹果肌圆形区域</strong>，略向上延伸至眼下，强化水润幼态感。'}],
+    guide:[{ic:'眉',tt:'平眉微弯，眉峰圆滑不硬朗',desc:'眉形整体<strong>平缓微弯</strong>，眉峰位置靠后且圆滑，避免上扬角度。平眉能最大化你的幼态优势。'},{ic:'眼',tt:'卧蚕打亮，下眼睑晕染粉色',desc:'卧蚕位置用<strong>珠光白或香草米提亮</strong>，下眼睑晕染腮粉色眼影，制造水润圆眼。'},{ic:'肌',tt:'高光打苹果肌，强化水润感',desc:'高光集中在<strong>苹果肌最高点</strong>，制造水光肌效果；避免打骨感高光。'},{ic:'廓',tt:'轻修容收紧下颌，不强调骨感',desc:'修容用<strong>浅暖棕极轻扫下颌线</strong>，仅做轮廓收紧，不强调颧骨走势。'}],
+    forbid:['上扬眼线','骨感修容','深色烟熏','深酒红唇','硬朗眉峰','哑光重底妆'],
+    roleRec:[1,3], lipDesc:'水粉红/珊瑚橘 · 水润必胜色'},
+  YJ:{name:'御姐气场脸',no:'004',traits:'颧骨外扩 · 下颌线清晰 · 眼型偏长',rarity:'TOP 15%',accent:'#8a7aaa',
+    celeb:{name:'刘亦菲型',en:'Cold Power',trait:'颧骨有力 · 眼型修长',match:'90%',bg:'linear-gradient(135deg,#1a0a2a,#4a2a6a)',ic:'👑'},
+    props:[{l:'颧骨外扩度',s:'9.3',p:93},{l:'下颌线清晰度',s:'9.0',p:90},{l:'眼型修长度',s:'8.7',p:87},{l:'面部轮廓感',s:'8.8',p:88},{l:'三庭均衡度',s:'7.8',p:78}],
+    insight:'你的<strong>颧骨外扩与下颌线组合</strong>是御姐气场的骨骼基础，天然具备压迫式美感。<strong>强化上庭饱满感</strong>能进一步拉长气质纵深，让整体更具故事感。',
+    colorGroups:[
+      {t:'Eye Shadow · 眼影',sw:[['#6a5888','烟熏紫',1],['#9098b0','银灰',1],['#4a3860','深李子',0],['#808898','钢蓝灰',0],['#c8c0d8','珠光紫',0]],tip:'推荐<strong>烟熏紫 + 银灰</strong>叠晕，眼尾深压，眼头点珠光紫提亮。',av:['#e07040','#f0b080'],avl:'暖橘/珊瑚系'},
+      {t:'Lip · 口红',sw:[['#7a4060','深莓紫',1],['#904060','冷玫红',1],['#6a3050','暗李子',0],['#a06080','梅子',0]],tip:'<strong>深莓紫与冷玫红</strong>是你的气场加成色；暖橘唇会稀释骨相的冷峻感。',av:['#e07040','#f0b080'],avl:'暖橘/珊瑚系'},
+      {t:'Blush · 腮红',sw:[['#9080a0','冷莓紫',1],['#b090a8','丁香灰',0],['#a08898','烟粉',0]],tip:'腮红沿<strong>颧骨外侧向斜上方扫</strong>，冷调莓紫色最能强化气场感。'}],
+    guide:[{ic:'眉',tt:'平直眉峰，强化水平气场线',desc:'眉形整体<strong>偏平直，眉峰角度低而有力</strong>，延长眉尾与眼尾对齐。过高的眉峰会削弱成熟感。'},{ic:'眼',tt:'眼线拉长至眼尾外，强化修长感',desc:'眼线从内眼角画起，<strong>眼尾向外延伸4-5mm</strong>，微微上扬收尾；配合烟熏晕染。'},{ic:'廓',tt:'颧骨修容向外扫，放大骨相宽度',desc:'修容从颧骨最高点<strong>向外侧斜扫</strong>，顺应颧骨外扩结构；下颌线补修容加深轮廓锐利度。'},{ic:'骨',tt:'额头中央细高光，拉升纵向气场',desc:'高光沿额头中轴<strong>垂直细打</strong>，增加上庭饱满度与纵深感，不要横向散开。'}],
+    forbid:['暖橘唇色','圆形腮红','弯弯细眉','卧蚕晕染','粉嫩色系','无眼线妆感'],
+    roleRec:[0,4], lipDesc:'深莓紫/冷玫红 · 气场必胜色'},
+  JL:{name:'精灵仙气脸',no:'005',traits:'面部偏长 · 五官精细 · 额头饱满',rarity:'TOP 10%',accent:'#8898c8',
+    celeb:{name:'刘诗诗型',en:'Ethereal',trait:'精细五官 · 清透气质',match:'89%',bg:'linear-gradient(135deg,#0a1a2a,#2a3a6a)',ic:'🌙'},
+    props:[{l:'额骨饱满度',s:'9.4',p:94},{l:'五官精细度',s:'9.2',p:92},{l:'面部纵向感',s:'8.8',p:88},{l:'轮廓通透感',s:'8.6',p:86},{l:'面宽适中度',s:'7.2',p:72}],
+    insight:'你的<strong>额骨饱满与五官精细</strong>是精灵仙气的根源，拥有超高镜头减龄优势。<strong>颞部与眉尾处轻打高光</strong>，能让面部比例更饱满均衡。',
+    colorGroups:[
+      {t:'Eye Shadow · 眼影',sw:[['#b0b8d8','薰衣草',1],['#d8e0f0','月光白',1],['#8898c0','雾霭蓝',0],['#c0a8c8','藕紫',0],['#e8e8f0','珍珠白',0]],tip:'推荐<strong>薰衣草 + 月光白</strong>轻晕全眼，内眼角点珍珠白，制造空灵透光的仙气眼妆。',av:['#3d1f14','#6b1e2a'],avl:'浓重深色系'},
+      {t:'Lip · 口红',sw:[['#d8a8b8','仙露粉',1],['#c8b0d0','淡藕紫',1],['#e8c8d0','裸玫',0],['#b898b0','雾紫粉',0]],tip:'<strong>仙露粉与淡藕紫</strong>是最能激活仙气的唇色；浓重口红会打破整体通透感。',av:['#8b2a2a','#c4773a'],avl:'深色/暖橘唇'},
+      {t:'Blush · 腮红',sw:[['#d0c0e0','雾丁香',1],['#e0c8d8','淡藕粉',0],['#c8d0e8','冰蓝粉',0]],tip:'腮红用<strong>雾丁香极轻晕染全脸</strong>，制造空气感肌底；避免过浓腮红。'}],
+    guide:[{ic:'眉',tt:'羽毛感自然眉，不刻意描画',desc:'眉形保持<strong>自然生长感</strong>，用眉粉轻扫填补空隙即可，不画硬线条。羽毛眉完美呼应精灵气质。'},{ic:'眼',tt:'下眼睑晕染，制造空灵水眸',desc:'眼线<strong>极细或不画</strong>，重点在下眼睑用薰衣草色晕染，内外眼角点珍珠白。'},{ic:'骨',tt:'颞部高光，补充面部横向饱满',desc:'高光除额头外，<strong>颞部（太阳穴）轻打珍珠白</strong>，视觉拓宽面部横向比例。'},{ic:'底',tt:'通透底妆，水光感优先',desc:'底妆追求<strong>轻薄通透的水光质地</strong>，避免哑光粉底压住精细五官。'}],
+    forbid:['浓重烟熏','深色口红','粗描眉线','哑光厚底妆','骨感修容','暖橘色调'],
+    roleRec:[3,1], lipDesc:'仙露粉/淡藕紫 · 仙气必胜色'},
+  TX:{name:'甜系邻家脸',no:'006',traits:'圆润心形轮廓 · 眼睛有神 · 鼻头圆润',rarity:'TOP 22%',accent:'#d4885a',
+    celeb:{name:'张子枫型',en:'Sweet Charm',trait:'心形脸 · 大眼有神',match:'91%',bg:'linear-gradient(135deg,#2a1000,#7c3a10)',ic:'🍑'},
+    props:[{l:'眼睛神采度',s:'9.3',p:93},{l:'亲和感指数',s:'9.1',p:91},{l:'轮廓圆润度',s:'8.8',p:88},{l:'感染力强度',s:'9.0',p:90},{l:'轮廓立体度',s:'6.8',p:68}],
+    insight:'你的<strong>眼睛神采与天然亲和感</strong>是最强的社交武器，室内镜头表现力极佳。<strong>精准修容提升鼻梁与颧骨层次</strong>，能在保留甜系气质的同时增加精致度。',
+    colorGroups:[
+      {t:'Eye Shadow · 眼影',sw:[['#f0c090','暖杏橘',1],['#e8a878','蜜桃棕',1],['#d4b090','奶茶',0],['#f0e0d0','香草米',0],['#e8c8a0','香槟金',0]],tip:'推荐<strong>暖杏橘 + 蜜桃棕</strong>晕染双眼，内眼角香草米提亮，强化眼睛神采与暖意感染力。'},
+      {t:'Lip · 口红',sw:[['#e87858','珊瑚橘',1],['#e89070','暖桃橘',1],['#d47060','砖橘',0],['#f0a880','水蜜桃',0]],tip:'<strong>珊瑚橘与暖桃橘</strong>是你的专属必胜色；冷调深色唇破坏甜系基调。',av:['#6b1e2a','#7a4060'],avl:'深色/冷调唇'},
+      {t:'Blush · 腮红',sw:[['#f0a870','暖橘粉',1],['#f0b888','蜜桃橘',0],['#e8c098','杏橘',0]],tip:'腮红打在<strong>苹果肌圆形区域并向颧骨微扩</strong>，暖橘调激活感染力。'}],
+    guide:[{ic:'眉',tt:'自然弓形眉，眉峰位置适中',desc:'眉形呈<strong>自然弓形，眉峰不过高不过低</strong>，眉色与发色接近；以自然为原则。'},{ic:'眼',tt:'强化眼神，卧蚕+下睫毛',desc:'眼线贴近睫毛根部<strong>纤细描画</strong>，重点强化卧蚕提亮与下睫毛涂刷，让大眼神采成为视觉核心。'},{ic:'鼻',tt:'鼻侧轻修容，增加精致立体感',desc:'鼻梁两侧用<strong>暖棕色轻扫阴影</strong>，鼻头用遮瑕提亮，精准制造鼻梁立体感。'},{ic:'唇',tt:'渐变唇，中间浓边缘淡',desc:'用<strong>深一号珊瑚橘打唇中，浅色晕开至唇边</strong>，渐变唇增加立体饱满感。'}],
+    forbid:['冷调深色唇','烟熏眼妆','过高眉峰','冷粉腮红','硬线条修容','哑光厚底'],
+    roleRec:[1,3], lipDesc:'珊瑚橘/暖桃橘 · 甜系必胜色'},
+};
+const CPROFILES={
+  cool:{label:'冷底调',note:'你的肤色偏冷，推荐冰感、蓝调、粉调；暖橘系上脸容易显脏，以冷调版本为主。',color:'#7aa0c8'},
+  warm:{label:'暖底调',note:'你的肤色偏暖，推荐暖橘、金调、土调；冷灰色调容易让气色显沉，以暖调版本为主。',color:'#c89060'},
+  neutral:{label:'中性底调',note:'你的底调较为中性，冷暖色系都能驾驭，报告中的推荐色系可直接使用。',color:'#a09880'},
+};
+
+/* Role recommend map: bone key → role indices */
+const ROLE_REC={QC:[0],NY:[0,4],SG:[1],YJ:[0],JL:[3],TX:[1]};
+
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+const roles=[
+  {name:'都市女主角'},{name:'甜系少女'},{name:'赛博朋克'},{name:'森系精灵'},{name:'复古女王'}
+];
+let currentRole=0, filterOn=false;
+let boneScores={QC:0,NY:0,SG:0,YJ:0,JL:0,TX:0}, colorVotes={cool:0,warm:0,neutral:0};
+let currentQ=0, boneResult=null;
+
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+function goScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active','fi');s.style.display='none';});
+  const t=document.getElementById(id);
+  t.style.display='flex';
+  requestAnimationFrame(()=>t.classList.add('active','fi'));
+  updateRoleUI();
+}
+
+function updateRoleUI(){
+  const r=roles[currentRole];
+  const el=id=>document.getElementById(id);
+  if(el('ward-role'))  el('ward-role').textContent =r.name+' 的衣橱';
+  if(el('fit-role'))   el('fit-role').textContent  =r.name;
+  if(el('pkg-ti'))     el('pkg-ti').textContent    =r.name+' · 变身礼包';
+}
+
+/* ══════════════════════════════════════════
+   BONE TEST QUIZ
+══════════════════════════════════════════ */
+function startBoneTest(){
+  currentQ=0;
+  boneScores={QC:0,NY:0,SG:0,YJ:0,JL:0,TX:0};
+  colorVotes={cool:0,warm:0,neutral:0};
+  goScreen('obq');
+  renderQ();
+}
+
+function quizBack(){
+  if(currentQ===0) goScreen('ob1');
+  else goScreen('ob1');
+}
+
+function renderQ(){
+  const Q=QUESTIONS[currentQ];
+  const tot=QUESTIONS.length;
+  document.getElementById('qcat-lbl').textContent=Q.catL;
+  document.getElementById('qcounter').textContent=(currentQ+1)+' / '+tot;
+  document.getElementById('qpfill').style.width=((currentQ+1)/tot*100)+'%';
+  document.getElementById('qcat').textContent=Q.cat;
+  document.getElementById('qqtext').textContent=Q.q;
+  const hint=document.getElementById('qhint');
+  hint.textContent=Q.hint||'';
+  hint.style.display=Q.hint?'block':'none';
+  const optsEl=document.getElementById('qopts');
+  optsEl.innerHTML='';
+  Q.opts.forEach((opt,i)=>{
+    const d=document.createElement('div');
+    d.className='qopt';
+    d.innerHTML='<div class="qdot"></div>'+opt;
+    d.onclick=()=>pickQ(i,d);
+    optsEl.appendChild(d);
+  });
+}
+
+function pickQ(idx,el){
+  if(el.classList.contains('on')) return;
+  document.querySelectorAll('.qopt').forEach(o=>o.classList.remove('on'));
+  el.classList.add('on');
+  const Q=QUESTIONS[currentQ];
+  if(Q.sc) Object.keys(Q.sc[idx]||{}).forEach(k=>boneScores[k]=(boneScores[k]||0)+Q.sc[idx][k]);
+  if(Q.color) colorVotes[Q.color[idx]]=(colorVotes[Q.color[idx]]||0)+1;
+  setTimeout(()=>{
+    currentQ++;
+    if(currentQ>=QUESTIONS.length) finishQuiz();
+    else renderQ();
+  },320);
+}
+
+function finishQuiz(){
+  goScreen('obc');
+  const steps=document.getElementById('csteps').querySelectorAll('.cstep');
+  steps.forEach((s,i)=>setTimeout(()=>s.classList.add('lit'),300+i*450));
+  setTimeout(calcResult,2500);
+}
+
+function calcResult(){
+  const sorted=Object.keys(boneScores).sort((a,b)=>boneScores[b]-boneScores[a]);
+  const pk=sorted[0], sk=sorted[1];
+  const ps=boneScores[pk], ss=boneScores[sk];
+  const isMixed=(ss>=ps*.75)&&(ss>=4);
+  const ck=Object.keys(colorVotes).sort((a,b)=>colorVotes[b]-colorVotes[a])[0];
+  boneResult={pk,sk,ps,ss,isMixed,ck};
+  renderReveal();
+}
+
+function renderReveal(){
+  const r=boneResult, bt=TYPES[r.pk], cp=CPROFILES[r.ck];
+  document.documentElement.style.setProperty('--BA',bt.accent);
+  document.documentElement.style.setProperty('--bone-fade',bt.accent+'22');
+  // Reveal screen
+  document.getElementById('obr-no').textContent=bt.no;
+  document.getElementById('obr-rar').textContent=bt.rarity;
+  document.getElementById('obr-nm').textContent=bt.name+(r.isMixed?'（混合型）':'');
+  document.getElementById('obr-tr').textContent=bt.traits;
+  document.getElementById('obr-cav').textContent=bt.celeb.ic;
+  document.getElementById('obr-cav').style.background=bt.celeb.bg;
+  document.getElementById('obr-cnm').textContent=bt.celeb.name;
+  document.getElementById('obr-cen').textContent=bt.celeb.en;
+  document.getElementById('obr-ctr').textContent=bt.celeb.trait;
+  document.getElementById('obr-cpct').textContent=bt.celeb.match;
+  document.getElementById('obr-props').innerHTML=bt.props.map(p=>`
+    <div class="prop-row">
+      <span class="prop-lbl">${p.l}</span>
+      <div class="prop-bar-wrap"><div class="prop-bar" style="width:${p.p}%"></div></div>
+      <span class="prop-score">${p.s}</span>
+    </div>`).join('');
+  document.getElementById('obr-insight').innerHTML=bt.insight;
+  document.getElementById('obr-cpdot').style.background=cp.color;
+  document.getElementById('obr-cplbl').textContent=cp.label;
+  document.getElementById('obr-cpnote').textContent=cp.note;
+  // Also fill S5 result
+  fillS5Result(bt,cp,r);
+  // Update S7 bone strip
+  document.getElementById('s7-bone-nm').textContent='骨相：'+bt.name;
+  document.getElementById('s7-bone-strip').style.display='flex';
+  // Update S2 bone match hint
+  document.getElementById('bms-nm').textContent=bt.name;
+  // Highlight recommended roles
+  const recRoles=ROLE_REC[r.pk]||[];
+  for(let i=0;i<5;i++){
+    const rc=document.getElementById('rc'+i);
+    const existing=rc.querySelector('.rec-badge');
+    if(existing) existing.remove();
+    if(recRoles.includes(i)){
+      const badge=document.createElement('div');
+      badge.className='rec-badge';
+      badge.textContent='骨相推荐';
+      rc.appendChild(badge);
+    }
+  }
+  // Lip desc in package
+  if(document.getElementById('lip-desc')) document.getElementById('lip-desc').textContent=bt.lipDesc||'专属推荐色号';
+  goScreen('obr');
+}
+
+function fillS5Result(bt,cp,r){
+  document.getElementById('s5r-no').textContent=bt.no;
+  document.getElementById('s5r-rar').textContent=bt.rarity;
+  document.getElementById('s5r-nm').textContent=bt.name+(r.isMixed?'（混合型）':'');
+  document.getElementById('s5r-tr').textContent=bt.traits;
+  document.getElementById('s5r-cpdot').style.background=cp.color;
+  document.getElementById('s5r-cplbl').textContent=cp.label;
+  document.getElementById('s5r-cpnote').textContent=cp.note;
+  if(document.getElementById('s5r-cta-sub')) document.getElementById('s5r-cta-sub').textContent=bt.lipDesc||'专属色号 · 精准单品推荐';
+  // Swatch content
+  document.getElementById('sw-content').innerHTML=bt.colorGroups.map(g=>`
+    <div class="swatch-group" style="margin-bottom:16px;">
+      <div class="sg-t">${g.t}</div>
+      <div class="sw-row">${g.sw.map(([h,nm,rec])=>`
+        <div class="sw-itm${rec?' rec':''}">
+          <div class="sw-c" style="background:${h};"></div>
+          <div class="sw-nm">${nm}</div>
+        </div>`).join('')}</div>
+      <div class="sw-tip">${g.tip}</div>
+      ${g.av?`<div class="sw-av"><span class="av-lbl">避开：${g.avl}</span><div class="av-sw">${g.av.map(h=>`<div class="av-s" style="background:${h};"></div>`).join('')}</div></div>`:''}
+    </div>`).join('');
+  document.getElementById('gd-content').innerHTML=bt.guide.map(g=>`
+    <div class="gi">
+      <div class="gi-ic">${g.ic}</div>
+      <div><div class="gi-tt">${g.tt}</div><div class="gi-desc">${g.desc}</div></div>
+    </div>`).join('');
+  document.getElementById('fbd-content').innerHTML=bt.forbid.map(f=>`
+    <div class="fbd-itm"><div class="fbd-x">✕</div><div class="fbd-txt">${f}</div></div>`).join('');
+}
+
+function goToFreeLook(){
+  const r=boneResult; if(!r) return;
+  const fl=FREE_LOOK[r.pk]||FREE_LOOK.QC;
+  const bt=TYPES[r.pk];
+
+  // Populate obf screen
+  document.getElementById('obf-vis').textContent=fl.vis;
+  document.getElementById('obf-role').textContent=fl.role;
+  document.getElementById('obf-hl').textContent=fl.headline;
+  document.getElementById('obf-desc').textContent=fl.desc;
+
+  // Bone accent bg on visual
+  if(bt){
+    document.getElementById('obf-vis').style.background=bt.celeb.bg;
+  }
+
+  // Render 3 look items
+  document.getElementById('obf-items').innerHTML=fl.items.map(it=>`
+    <div class="obf-item">
+      <div class="obf-item-ic">${it.ic}</div>
+      <div class="obf-item-info">
+        <div class="obf-item-name">${it.name}</div>
+        <div class="obf-item-desc">${it.desc}</div>
+      </div>
+      <div class="obf-item-chk">✓</div>
+    </div>
+  `).join('');
+
+  goScreen('obf');
+}
+
+function goToMain(){
+  // Switch S5 to result state
+  document.querySelectorAll('.s5-st').forEach(s=>s.classList.remove('on'));
+  document.getElementById('s5r').classList.add('on');
+  goScreen('s2');
+}
+
+function skipToMain(){
+  goScreen('s2');
+}
+
+/* ══════════════════════════════════════════
+   PHOTO SCAN PATH
+══════════════════════════════════════════ */
+function startPhotoScan(){
+  goScreen('obs2');
+}
+
+let scanTimer=null;
+function startScanTimer(){
+  // Re-trigger step animations by replacing obs3 steps
+  const steps=document.querySelectorAll('.obs3-step');
+  steps.forEach(s=>{s.style.animation='none';s.offsetHeight;s.style.animation='';});
+  if(scanTimer) clearTimeout(scanTimer);
+  // After 3.2s, assign a result and show bone reveal
+  scanTimer=setTimeout(()=>scanComplete(), 3200);
+}
+
+function scanComplete(){
+  // Reset scores and assign a scan-derived result
+  // Uses a simple hash of the current minute to produce consistent but varied results
+  const types=['QC','NY','SG','YJ','JL','TX'];
+  const seed=(Date.now()>>10)%types.length; // changes every ~17 min
+  const pk=types[seed];
+  const sk=types[(seed+2)%types.length];
+  const ps=12, ss=8;
+  // pick color profile
+  const colorKeys=['cool','warm','neutral'];
+  const ck=colorKeys[seed%3];
+
+  boneResult={pk,sk,ps,ss,isMixed:false,ck,fromScan:true};
+  boneScores[pk]=ps; boneScores[sk]=ss;
+  colorVotes[ck]=2;
+
+  renderReveal();
+}
+
+/* ══════════════════════════════════════════
+   SHARE TO XIAOHONGSHU
+══════════════════════════════════════════ */
+function shareResult(){
+  if(!boneResult) return;
+  const r=boneResult;
+  const bt=TYPES[r.pk];
+  const fl=FREE_LOOK[r.pk]||FREE_LOOK.QC;
+
+  // Fill share card
+  document.getElementById('sc-bone').textContent=bt.name;
+  document.getElementById('sc-role').textContent=fl.role+' · 专属造型已解锁';
+  document.getElementById('sc-pills').innerHTML=
+    fl.items.map(it=>`<div class="share-card-pill">${it.ic} ${it.name}</div>`).join('')+
+    `<div class="share-card-pill">骨相 ${bt.rarity}</div>`;
+
+  document.getElementById('share-overlay').classList.add('on');
+}
+
+function closeShare(e){
+  if(!e||e.target===document.getElementById('share-overlay')){
+    document.getElementById('share-overlay').classList.remove('on');
+  }
+}
+
+function copyShareText(){
+  if(!boneResult) return;
+  const bt=TYPES[boneResult.pk];
+  const fl=FREE_LOOK[boneResult.pk]||FREE_LOOK.QC;
+  const text=`【骨相测试报告】${bt.name} ${bt.rarity}\n`+
+    `🎭 专属角色：${fl.role}\n`+
+    `👁️ 眼妆：${fl.items[0].name}\n`+
+    `💄 口红：${fl.items[1].name}\n`+
+    `👗 造型：${fl.items[2].name}\n\n`+
+    `#今天你想成为谁 #骨相妆造 #${bt.name} #变美攻略`;
+  navigator.clipboard.writeText(text).then(()=>{
+    showToast('✅ 文案已复制，粘贴到小红书发布吧～');
+    closeShare();
+  }).catch(()=>{
+    showToast('请手动截图分享到小红书');
+  });
+}
+
+function retake(){
+  // Reset to entry state in S5
+  document.querySelectorAll('.s5-st').forEach(s=>s.classList.remove('on'));
+  document.getElementById('s5e').classList.add('on');
+  boneResult=null;
+  goScreen('ob1');
+}
+
+/* ══════════════════════════════════════════
+   RESULT TABS (S5)
+══════════════════════════════════════════ */
+function setRTab(idx,el){
+  document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.rpanel').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('rp'+idx).classList.add('on');
+}
+
+/* ══════════════════════════════════════════
+   ROLE SELECT
+══════════════════════════════════════════ */
+function selectRole(idx){
+  currentRole=idx;
+  document.querySelectorAll('.rcard').forEach((c,i)=>c.classList.toggle('sel',i===idx));
+  showToast('✦ 已选定：'+roles[idx].name);
+  setTimeout(()=>goScreen('s3'),700);
+}
+
+/* ══════════════════════════════════════════
+   FITTING ROOM
+══════════════════════════════════════════ */
+function toggleFilter(){
+  filterOn=!filterOn;
+  document.getElementById('fbg').className='fbg '+(filterOn?'f':'n');
+  document.getElementById('fbdg').classList.toggle('on',filterOn);
+  if(filterOn) showToast('🎬 影视级滤镜已开启');
+}
+function pickOut(el,e){
+  e.stopPropagation();
+  document.querySelectorAll('.pitm').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+}
+
+/* ══════════════════════════════════════════
+   MISC TABS
+══════════════════════════════════════════ */
+function setCTab(el){
+  document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+}
+function setOrdTab(el){
+  document.querySelectorAll('.ord-tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+let _tt;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('on');
+  clearTimeout(_tt);
+  _tt=setTimeout(()=>t.classList.remove('on'),2200);
+}
+
+/* ══════════════════════════════════════════
+   PARTICLES
+══════════════════════════════════════════ */
+function initParticles(){
+  const c=document.getElementById('ptcl');
+  for(let i=0;i<28;i++){
+    const p=document.createElement('div');
+    p.className='pt';
+    p.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${4+Math.random()*6}s;--dl:-${Math.random()*5}s;--op:${.15+Math.random()*.5};width:${1+Math.random()*3}px;height:${1+Math.random()*3}px;`;
+    c.appendChild(p);
+  }
+}
+initParticles();
+updateRoleUI();
+
+/* ── PWA: register service worker ── */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js')
+      .then(r=>console.log('[SW] registered', r.scope))
+      .catch(e=>console.warn('[SW] failed', e));
+  });
+}
+</script>
+</body>
+</html>

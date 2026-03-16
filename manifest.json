@@ -1,0 +1,26 @@
+{
+  "name": "今天你想成为谁",
+  "short_name": "羽翎",
+  "description": "AI影视级妆造 · 骨相定制",
+  "start_url": "./app-demo.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D0D0D",
+  "theme_color": "#0D0D0D",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "icon-192.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["lifestyle", "entertainment"]
+}

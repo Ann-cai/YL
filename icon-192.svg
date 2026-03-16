@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="40" fill="#0D0D0D"/>
+  <circle cx="96" cy="78" r="28" fill="none" stroke="#C9A84C" stroke-width="2.5"/>
+  <ellipse cx="96" cy="78" rx="10" ry="14" fill="none" stroke="#C9A84C" stroke-width="1.5"/>
+  <line x1="68" y1="78" x2="124" y2="78" stroke="#C9A84C" stroke-width="1.5"/>
+  <path d="M96 106 C68 106 52 122 50 145 L142 145 C140 122 124 106 96 106Z" fill="none" stroke="#C9A84C" stroke-width="2"/>
+  <text x="96" y="170" text-anchor="middle" font-family="serif" font-size="14" fill="#C9A84C" letter-spacing="2">羽翎</text>
+</svg>
