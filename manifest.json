@@ -2,7 +2,7 @@
   "name": "今天你想成为谁",
   "short_name": "羽翎",
   "description": "AI影视级妆造 · 骨相定制",
-  "start_url": "./app-demo.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0D0D0D",
