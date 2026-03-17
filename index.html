@@ -406,25 +406,44 @@ body::before{
 .obch-hint em{color:rgba(255,100,120,.6);font-style:normal;}
 
 /* ── OBS2: PHOTO UPLOAD ── */
-#obs2{overflow:hidden;flex-direction:column;justify-content:flex-start;padding:48px 28px 28px;}
-.obs2-head{text-align:center;margin-bottom:20px;width:100%;}
-.obs2-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;letter-spacing:.15em;color:var(--text);margin-bottom:6px;}
-.obs2-sub{font-size:10px;color:var(--t2);letter-spacing:.15em;}
-.obs2-grid-wrap{width:260px;height:340px;position:relative;margin:0 auto 14px;flex-shrink:0;}
+#obs2{overflow:hidden;flex-direction:column;}
+.obs2-scroll{flex:1;overflow-y:auto;scrollbar-width:none;padding:44px 20px 28px;}
+.obs2-scroll::-webkit-scrollbar{display:none;}
+.obs2-head{text-align:center;margin-bottom:16px;position:relative;}
+.obs2-back-btn{position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:18px;color:var(--t2);cursor:pointer;padding:4px 8px;}
+.obs2-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;letter-spacing:.1em;color:var(--text);margin-bottom:4px;}
+.obs2-sub{font-size:10px;color:var(--t2);letter-spacing:.1em;}
+/* 3-step row */
+.obs2-steps-row{display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:16px;}
+.obs2-step-item{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;max-width:80px;}
+.obs2-step-num{width:26px;height:26px;border-radius:50%;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gold);}
+.obs2-step-txt{font-size:9px;color:var(--t2);text-align:center;line-height:1.5;letter-spacing:.02em;}
+.obs2-step-txt span{color:var(--t3);font-size:9px;}
+.obs2-step-arrow{font-size:10px;color:var(--t3);flex-shrink:0;}
+/* frame */
+.obs2-grid-wrap{width:220px;height:290px;position:relative;margin:0 auto 14px;flex-shrink:0;}
 .obs2-grid-frame{width:100%;height:100%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);position:relative;}
 .obs2-grid-frame::before{content:'';position:absolute;inset:0;border:1px solid rgba(201,168,76,.3);}
-.obs2-grid-cell{border:1px dashed rgba(201,168,76,.12);}
-.obs2-corner{position:absolute;width:20px;height:20px;}
+.obs2-grid-cell{border:1px dashed rgba(201,168,76,.1);}
+.obs2-corner{position:absolute;width:18px;height:18px;}
 .obs2-corner.tl{top:-1px;left:-1px;border-top:2px solid var(--gold);border-left:2px solid var(--gold);}
 .obs2-corner.tr{top:-1px;right:-1px;border-top:2px solid var(--gold);border-right:2px solid var(--gold);}
 .obs2-corner.bl{bottom:-1px;left:-1px;border-bottom:2px solid var(--gold);border-left:2px solid var(--gold);}
 .obs2-corner.br{bottom:-1px;right:-1px;border-bottom:2px solid var(--gold);border-right:2px solid var(--gold);}
 .obs2-scan-line{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,rgba(201,168,76,.7),transparent);animation:obs-scan 2.4s ease-in-out infinite;}
 @keyframes obs-scan{0%{top:0;}100%{top:100%;}}
-.obs2-oval{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:122px;height:168px;border:1px dashed rgba(201,168,76,.5);border-radius:50% 50% 44% 44%;}
-.obs2-tip{font-size:10px;color:var(--t2);letter-spacing:.1em;text-align:center;margin-bottom:16px;}
-.obs2-btn{width:100%;padding:15px;border-radius:16px;border:none;background:var(--gg);background-size:200%;font-size:13px;font-weight:700;color:#0D0D0D;letter-spacing:.08em;cursor:pointer;animation:shimmer 3s infinite;box-shadow:0 6px 24px rgba(201,168,76,.35);}
-.obs2-back{text-align:center;margin-top:10px;font-size:11px;color:var(--t3);cursor:pointer;letter-spacing:.04em;}
+.obs2-oval{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:104px;height:144px;border:1px dashed rgba(201,168,76,.5);border-radius:50% 50% 44% 44%;}
+.obs2-face-tip{position:absolute;bottom:-22px;left:0;right:0;font-size:9px;color:var(--t3);text-align:center;letter-spacing:.04em;}
+/* do/dont */
+.obs2-dodo{display:flex;gap:10px;margin-bottom:16px;}
+.obs2-do,.obs2-dont{flex:1;background:rgba(255,255,255,.02);border-radius:12px;padding:12px 10px;border:1px solid rgba(255,255,255,.05);}
+.obs2-do{border-color:rgba(80,200,100,.1);}
+.obs2-dont{border-color:rgba(255,80,80,.08);}
+.obs2-dodo-title{font-size:10px;font-weight:700;color:var(--text);margin-bottom:8px;letter-spacing:.04em;}
+.obs2-dodo-item{font-size:9px;color:var(--t2);line-height:1.8;letter-spacing:.02em;}
+/* upload */
+.obs2-upload-btn{display:flex;align-items:center;justify-content:center;width:100%;padding:15px;border-radius:16px;background:var(--gg);background-size:200%;font-size:13px;font-weight:700;color:#0D0D0D;letter-spacing:.08em;cursor:pointer;animation:shimmer 3s infinite;box-shadow:0 6px 24px rgba(201,168,76,.35);margin-bottom:8px;}
+.obs2-upload-hint{text-align:center;font-size:9px;color:var(--t3);letter-spacing:.04em;}
 
 /* ── OBS3: SCANNING ── */
 #obs3{overflow:hidden;flex-direction:column;}
@@ -862,24 +881,70 @@ body::before{
 
   <!-- OBS2: PHOTO UPLOAD -->
   <div class="screen" id="obs2">
-    <div class="obs2-head">
-      <div class="obs2-title">上传你的照片</div>
-      <div class="obs2-sub">素颜 · 正面 · 光线充足</div>
-    </div>
-    <div class="obs2-grid-wrap">
-      <div class="obs2-grid-frame">
-        <div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div>
-        <div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div>
-        <div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div>
+    <div class="obs2-scroll">
+      <div class="obs2-head">
+        <div class="obs2-back-btn" onclick="goScreen('obch')">←</div>
+        <div class="obs2-title">AI 拍照骨相识别</div>
+        <div class="obs2-sub">跟着步骤来，30 秒出结果</div>
       </div>
-      <div class="obs2-corner tl"></div><div class="obs2-corner tr"></div>
-      <div class="obs2-corner bl"></div><div class="obs2-corner br"></div>
-      <div class="obs2-scan-line"></div>
-      <div class="obs2-oval"></div>
+
+      <!-- 3 steps -->
+      <div class="obs2-steps-row">
+        <div class="obs2-step-item">
+          <div class="obs2-step-num">1</div>
+          <div class="obs2-step-txt">找窗边<br><span>自然光最准</span></div>
+        </div>
+        <div class="obs2-step-arrow">→</div>
+        <div class="obs2-step-item">
+          <div class="obs2-step-num">2</div>
+          <div class="obs2-step-txt">摘掉眼镜<br><span>刘海拨开</span></div>
+        </div>
+        <div class="obs2-step-arrow">→</div>
+        <div class="obs2-step-item">
+          <div class="obs2-step-num">3</div>
+          <div class="obs2-step-txt">正面拍摄<br><span>表情自然</span></div>
+        </div>
+      </div>
+
+      <!-- Frame -->
+      <div class="obs2-grid-wrap">
+        <div class="obs2-grid-frame">
+          <div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div>
+          <div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div>
+          <div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div><div class="obs2-grid-cell"></div>
+        </div>
+        <div class="obs2-corner tl"></div><div class="obs2-corner tr"></div>
+        <div class="obs2-corner bl"></div><div class="obs2-corner br"></div>
+        <div class="obs2-scan-line"></div>
+        <div class="obs2-oval"></div>
+        <div class="obs2-face-tip">将脸部对齐椭圆，保持表情自然</div>
+      </div>
+
+      <!-- Do / Don't -->
+      <div class="obs2-dodo">
+        <div class="obs2-do">
+          <div class="obs2-dodo-title">✅ 这样拍</div>
+          <div class="obs2-dodo-item">💡 自然光线充足</div>
+          <div class="obs2-dodo-item">😶 素颜或淡妆</div>
+          <div class="obs2-dodo-item">👤 正面，不歪头</div>
+          <div class="obs2-dodo-item">📏 脸部占画面60%以上</div>
+        </div>
+        <div class="obs2-dont">
+          <div class="obs2-dodo-title">❌ 避免这些</div>
+          <div class="obs2-dodo-item">🔦 强光或逆光</div>
+          <div class="obs2-dodo-item">🕶️ 戴眼镜或帽子</div>
+          <div class="obs2-dodo-item">↙️ 侧脸或仰头</div>
+          <div class="obs2-dodo-item">💄 浓妆会影响结果</div>
+        </div>
+      </div>
+
+      <!-- Upload button -->
+      <label class="obs2-upload-btn" for="obs2-file-input">
+        📷 选择照片或拍摄
+        <input type="file" id="obs2-file-input" accept="image/*" capture="user" style="display:none" onchange="handlePhotoSelect(this)">
+      </label>
+      <div class="obs2-upload-hint">选完照片后自动开始分析</div>
     </div>
-    <div class="obs2-tip">将脸部对齐椭圆框，保持表情自然</div>
-    <button class="obs2-btn" onclick="goScreen('obs3');startScanTimer()">开始扫描 →</button>
-    <div class="obs2-back" onclick="goScreen('obch')">← 返回选择</div>
   </div>
 
   <!-- OBS3: SCANNING -->
@@ -1402,62 +1467,100 @@ const FREE_LOOK={
    BONE TEST DATA (19 questions, new version)
 ══════════════════════════════════════════ */
 const QUESTIONS=[
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'对镜观察，你的三庭哪段最短？',hint:'上庭：发际线→眉头 / 中庭：眉头→鼻尖 / 下庭：鼻尖→下巴',
-   opts:['上庭最短——额头不高，发际线靠下','上庭偏长——额头高，发际线明显偏高','中庭最短——眉眼鼻集中在面部中央','下庭最短——嘴和下巴离鼻子较近','三庭比例均衡，没有哪段特别短'],
-   sc:[{TX:2,SG:1},{JL:3,NY:1},{NY:2,SG:2},{TX:3,SG:2},{QC:4,YJ:2,JL:1}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'太阳穴区域（颞部）是否饱满？',hint:'额头两侧、眉梢与发际之间的区域。正面看是否有凹陷感？',
-   opts:['饱满圆润——额头到颧骨过渡流畅，无凹陷','轻微凹陷——整体仍流畅，略有起伏','明显凹陷——颞骨形态清晰可见，骨感强'],
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'对镜观察，你的三庭哪段最短？',
+   hint:'📐 上庭：发际线→眉头 ／ 中庭：眉头→鼻尖 ／ 下庭：鼻尖→下巴。站在镜子前，目测哪段最短就选哪个。',
+   opts:['上庭偏短——额头不高，发际线比较靠下','中庭偏短——眉眼鼻集中在面部中央区域','下庭偏短——嘴和下巴离鼻子感觉比较近','三庭差不多，看不出明显差距'],
+   sc:[{TX:2,SG:1},{NY:2,SG:2},{TX:3,SG:2},{QC:4,YJ:2,JL:1}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'太阳穴区域饱满还是凹陷？',
+   hint:'👆 太阳穴 = 额头两侧，眉梢往上一点的区域。正面看，这里有没有明显向内凹进去的感觉？',
+   opts:['饱满圆润——这块区域鼓鼓的，从额头到颧骨过渡很流畅','轻微凹陷——略微有一点凹进去，但不明显','明显凹陷——这里明显塌进去，骨头形状很清晰'],
    sc:[{JL:3,TX:2,SG:1},{QC:2,YJ:1},{NY:2,YJ:2}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'闭眼放松——眼窝是否有自然凹陷或阴影感？',hint:'不化妆状态下看上眼皮区域。眶骨是否将眼皮"托"出一个深邃的凹陷区？',
-   opts:['明显——有天然深邃感，眼皮区存在清晰阴影','轻微——有一点层次感，需仔细看才出现','几乎没有——眼皮饱满平整，无凹陷感'],
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'闭眼放松，上眼皮有没有自然的凹陷感？',
+   hint:'👁️ 素颜状态下试试看：闭上眼，感受上眼皮是饱满平整，还是有一块自然的"深邃阴影区"？',
+   opts:['有明显凹陷——上眼皮区有天然深邃感，像有阴影一样','轻微凹陷——仔细看有一点层次，不太明显','几乎没有——眼皮饱满平整，完全无凹陷'],
    sc:[{NY:5},{QC:3,JL:2},{SG:2,TX:3}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'用手指轻压眉头下方——眉骨是否有明显突起？',hint:'眉弓骨是额骨下缘的骨性凸起，清晰的眉骨带来折叠感和立体度。',
-   opts:['明显——眉弓骨感清晰，侧脸有清楚的折叠层次','轻微——能感觉到骨点，但不突出','没有——额头到眼眶过渡平滑，完全无凸起'],
-   sc:[{QC:4,NY:2},{YJ:2,JL:2},{SG:2,TX:2}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'不化妆放松状态，你的眼型更接近？',hint:'看眼睛整体形状，不考虑大小',
-   opts:['杏眼——细长，眼尾轻微上扬，有折叠感','修长眼——眼型窄长，眼尾偏平直甚至微下垂','水润感——眼皮饱满有肉感，明亮但不特别圆','圆眼——眼白比例高，眼神饱满明亮','深邃感——眼眶骨感强，有自然双层叠影','精致小眼——眼睛不大，但眼神清澈有神'],
-   sc:[{QC:4},{YJ:4,QC:1},{SG:4},{TX:4},{NY:4},{JL:4}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'两眼内眼角之间的距离（眼距）？',hint:'参考：一根手指横放的宽度约等于标准一只眼睛的宽度',
-   opts:['偏近——内眼角间距小于一只眼宽','标准——约等于一只眼宽度','偏宽——间距明显大于一只眼宽'],
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'侧脸时，额头到眼眶的过渡是？',
+   hint:'🔍 转向侧面，看从额骨往下到眼眶的连接，是一条流畅弧线，还是中间有个明显的"台阶"？',
+   opts:['平滑过渡——像一条弧线，额头和眼眶骨感觉连在一起','轻微台阶感——隐约能感觉到有高低差，但不极端','明显折叠——额骨和眼眶之间有清晰的凸起和凹陷'],
+   sc:[{SG:2,TX:2},{QC:2,YJ:2,JL:1},{QC:4,NY:2}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'你的眼皮类型是？',
+   hint:'👀 这个最容易判断！对着镜子睁眼，上眼皮有没有折痕？',
+   opts:['单眼皮——上眼皮没有折痕，眼皮紧贴眼球','内双——有一条细折痕，但被外眼皮盖住了（看着像单眼皮）','双眼皮——折痕清晰可见，眼睛有明显褶皱','宽双眼皮——折痕很高很宽，双眼皮面积大且圆'],
+   sc:[{NY:2,YJ:3},{QC:3,SG:2,JL:1},{QC:2,TX:2,SG:1},{JL:3,NY:1}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'你的外眼角（眼尾）方向？',
+   hint:'😌 放松看向正前方，不要刻意抬眼或低头，眼尾自然是向上翘、水平，还是微微向下？',
+   opts:['上扬——眼尾明显往上翘，有"狐狸眼"感','平直——眼尾基本水平，不上不下','微微下垂——眼尾轻微往下，眼神圆润有亲切感'],
+   sc:[{NY:3,QC:2},{YJ:3,JL:2,QC:1},{SG:3,TX:2}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'两眼内眼角之间的距离（眼距）？',
+   hint:'📏 参考：一只眼睛的宽度 ≈ 标准眼距。可以用手指比一下，感受两内眼角之间的空隙。',
+   opts:['偏近——两内眼角间距小于一只眼宽','标准——约等于一只眼的宽度','偏宽——间距明显大于一只眼宽'],
    sc:[{NY:3,QC:1},{QC:3,YJ:1},{SG:2,TX:2,JL:2}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'侧脸时，颧骨骨峰偏向哪个方向突出？',hint:'颧骨是脸中部可触摸到的骨性突起',
-   opts:['向外侧扩张——正面看脸显宽，有蝴蝶骨感','向前斜上方突起——侧脸立体，有明显骨峰感','颧骨偏高——紧贴眼眶下缘，有提升感','颧骨不突出——侧脸偏平，骨峰不明显'],
-   sc:[{YJ:3,NY:1},{NY:3,QC:2},{QC:2,JL:2},{SG:1,TX:1}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'鼻梁高度与形态？',hint:'从眉间（山根）到鼻尖的整体形态感',
-   opts:['鼻梁很高——山根深邃，鼻骨在眉间就已挺起','鼻梁适中——有流畅弧度，不高不低','鼻梁偏低——整体偏平，山根不突出'],
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'用手轻摸脸颊，颧骨最突出的骨点在哪里？',
+   hint:'✋ 从耳朵向鼻子方向轻按脸颊，找到最硬的骨点，感受它的位置偏高偏低、偏前偏后。',
+   opts:['靠近眼眶下方——颧骨高，紧贴眼睛下缘','脸颊外侧偏后——颧骨在侧面，正面看不太明显','脸颊正前方——正面能清楚感觉到，笑时苹果肌明显','摸不太出来——脸颊偏平，找不到突起骨点'],
+   sc:[{QC:3,JL:2},{YJ:3,NY:1},{NY:3,QC:1},{SG:1,TX:1}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'鼻梁整体高不高？',
+   hint:'👃 摸一下眉心（山根）到鼻尖，感受鼻梁骨在哪里开始挺起来，也可以侧脸看。',
+   opts:['很高——眉心处鼻骨就已经很挺，山根深邃','适中——有自然弧度，不算高鼻梁也不塌','偏低——山根不突出，鼻梁整体偏平'],
    sc:[{NY:4,QC:1},{QC:2,YJ:2,JL:2},{SG:2,TX:2}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'鼻头的形状与质感？',hint:'看鼻尖和鼻翼区域的形状',
-   opts:['圆润肉感——鼻头偏大，鼻翼较宽，有圆头感','尖细精致——鼻头小，鼻翼收敛','适中挺拔——不圆不尖，鼻翼比例正常，有骨感'],
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'你的鼻头形状？',
+   hint:'👃 看鼻尖和鼻翼（鼻孔两侧），是圆润宽大，还是小巧收敛？',
+   opts:['圆润肉感——鼻头偏大，鼻翼较宽，整体有"圆头"感','尖细精致——鼻头小巧，鼻翼收敛，有精致感','适中挺拔——不圆不尖，鼻翼正常，整体自然'],
    sc:[{TX:3,SG:2},{JL:3,QC:2},{NY:2,YJ:2}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'人中长度——鼻尖到上唇之间的距离？',hint:'感受鼻子底部到嘴唇上缘的距离',
-   opts:['短——鼻子与嘴唇很近，有幼态紧凑感','标准——不近不远，长度适中','长——鼻尖到嘴唇距离明显偏长'],
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'人中长度——鼻尖到上唇的距离？',
+   hint:'👆 感受鼻子底部到嘴唇上缘的间隔，不用量，目测感觉偏短、正常还是偏长就行。',
+   opts:['短——鼻子和嘴唇离得很近，有幼态紧凑感','标准——不近不远，比例适中','长——鼻尖到嘴唇距离明显比较长'],
    sc:[{TX:4,SG:2},{QC:2,NY:1},{JL:3,YJ:1}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'人中沟的深浅与清晰度？',hint:'鼻尖下方那两条竖向凹槽',
-   opts:['深且窄——人中沟清晰，唇峰由此上翘成型','浅平——不明显，鼻底到上唇过渡柔和圆润'],
-   sc:[{NY:3,QC:2,JL:2},{SG:3,TX:3}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'嘴唇厚度？',hint:'上唇和下唇的整体丰薄感',
-   opts:['薄唇——上下唇都偏薄，线条感强','适中——丰薄均衡，不厚不薄','丰润——上唇或下唇明显饱满厚实'],
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'人中沟（鼻尖正下方两条竖槽）深不深？',
+   hint:'💡 对着亮光，鼻子正下方有没有两条竖向的阴影沟槽？深的人唇峰会更明显。',
+   opts:['深且清晰——两条竖槽很清楚，唇峰形状漂亮','浅平——不太明显，鼻底到嘴唇过渡很柔和','几乎没有——完全平整，看不出沟槽'],
+   sc:[{NY:3,QC:2,JL:2},{YJ:2,QC:1},{SG:3,TX:3}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'嘴唇整体厚度？',
+   hint:'💋 自然放松不抿嘴，看上下唇的丰薄程度。',
+   opts:['薄唇——上下唇都比较薄，线条感强','适中——不厚不薄，丰薄均衡','丰润——嘴唇明显饱满，有肉感'],
    sc:[{QC:3,YJ:2,JL:1},{NY:2,QC:1,YJ:1},{SG:3,TX:3}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'唇峰（上唇正中两个高点）的清晰度？',hint:'上唇中央形成的弓形——是否有清晰的两个峰？',
-   opts:['唇峰高而清晰——M形明显，线条感强','唇峰适中——有弧度但不极端','唇峰平缓——圆弧感强，边界柔和，几乎无M形'],
-   sc:[{NY:3,JL:2,QC:1},{YJ:2,QC:1},{SG:3,TX:3}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'正面看，你的下巴形状？',hint:'',
-   opts:['尖细——有明显的锥形收尾','微尖——不宽也不方，轮廓分明','偏方或平——有棱角感，下巴不收尖','圆润饱满——下巴不明显，有柔和肉感'],
-   sc:[{JL:4,QC:2},{QC:2,NY:1},{YJ:4},{SG:4,TX:1}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'侧脸时，从耳垂到下巴的下颌骨线条？',hint:'侧脸角度观察最清晰',
-   opts:['锐利清晰——线条感强，骨感一眼可见','有弧度——骨感存在，但以柔和弧线呈现','圆润柔和——轮廓感不强，边界模糊'],
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'嘴角自然放松时是什么状态？',
+   hint:'😶 不要刻意控制表情，正常放松，看镜子里嘴角自然的方向。',
+   opts:['微微上扬——嘴角天然带笑意，亲切可爱','平直——嘴角水平，表情中立','微微下垂——嘴角轻微向下，有成熟感','左右不对称——两边嘴角高低不同'],
+   sc:[{TX:3,SG:2},{QC:3,NY:1},{YJ:4,NY:1},{JL:4}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'用手指轻摸下巴骨头，形状感觉是？',
+   hint:'✋ 轻触下巴正面，感受骨头的形状。是尖锐的、平台状的，还是圆滑的？',
+   opts:['骨感尖锐——触感锐利，有明显的尖端','横平台感——下巴骨像一个横向的小平台','圆弧形——骨头摸起来圆润，没有锐利感','骨头不明显——肉比较多，很难摸出骨形'],
+   sc:[{JL:4,QC:2},{YJ:4,NY:1},{SG:3,TX:2},{SG:1,TX:2}]},
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'侧脸时，从耳垂到下巴的下颌骨线条？',
+   hint:'👤 转向侧面，看从耳垂到下巴这段骨头，是棱角分明的线，还是圆滑的弧线？',
+   opts:['锐利清晰——线条感强，骨头形状一眼可见','弧线过渡——骨感存在，但以柔和弧线呈现','圆润柔和——轮廓感不强，边界比较模糊'],
    sc:[{YJ:4,QC:2},{NY:2,JL:2,QC:1},{SG:2,TX:2}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'正面看，脸最宽的横向区域在哪里？',hint:'对比额头 · 颧骨 · 下颌三个横向宽度',
-   opts:['颧骨区最宽，向上向下都明显收窄','额头最宽，向下逐渐收窄（心形感）','下颌/脸颊圆润，下半脸最饱满','三处宽度差不多，没有明显最宽点'],
-   sc:[{NY:2,YJ:2},{JL:2,QC:1},{SG:2,TX:2},{QC:3,YJ:1}]},
-  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',q:'面部纵横比——发际到下巴 vs 两颊最宽处？',hint:'发际线到下巴的距离 对比 两颊最宽处的距离',
-   opts:['脸偏长——竖向感明显','接近圆形——长宽几乎相等','均衡比例——不偏长也不偏圆','偏宽扁——横向感更强'],
+  {g:'bone',cat:'Bone Structure · 骨相分析',catL:'骨相分析',
+   q:'你的脸整体是偏长还是偏圆？',
+   hint:'📐 对比脸的纵向（发际线到下巴）和横向（两颊最宽处），哪个方向更长更明显？',
+   opts:['偏长——脸的纵向感明显，有"瓜子脸/长脸"感','接近圆形——长宽差不多，整体偏圆','均衡比例——不偏长也不偏圆，标准脸型','偏宽扁——横向感更强，脸颊宽广'],
    sc:[{JL:3,QC:2},{SG:3,TX:2},{QC:3,YJ:1},{YJ:2,NY:2}]},
-  {g:'color',cat:'Color Profile · 色彩定制',catL:'色彩定制',q:'自然光下，手腕内侧血管颜色偏？',hint:'这是判断肤色冷暖底调最客观的指标，光线要充足',
-   opts:['蓝色或紫色','绿色','蓝绿都有，难以分辨'],
+  {g:'color',cat:'Color Profile · 色彩定制',catL:'色彩定制',
+   q:'自然光下，手腕内侧血管颜色偏？',
+   hint:'🩸 这是判断肤色冷暖最客观的方式！去有自然光的地方（窗边），翻开手腕内侧，看血管颜色。手机灯光下颜色会失真。',
+   opts:['蓝色或紫色（偏冷）','绿色（偏暖）','蓝绿都有，看不出来'],
    color:['cool','warm','neutral']},
-  {g:'color',cat:'Color Profile · 色彩定制',catL:'色彩定制',q:'你的整体肤色调性？',hint:'',
-   opts:['冷白 / 粉白（皮肤有粉调或蓝调）','自然白 / 象牙白（不偏冷不偏暖）','暖米 / 黄白（皮肤偏黄或金调）','健康小麦 / 深肤（暖调明显）'],
+  {g:'color',cat:'Color Profile · 色彩定制',catL:'色彩定制',
+   q:'你的整体肤色调性？',
+   hint:'💡 不确定就选最接近的，这道题辅助判断，不影响主要骨相结果。',
+   opts:['冷白 / 粉白——皮肤有粉调或蓝调','自然白 / 象牙白——不偏冷不偏暖','暖米 / 黄白——皮肤偏黄或金调','健康小麦 / 深肤——暖调明显'],
    color:['cool','neutral','warm','warm']},
 ];
 
@@ -1763,6 +1866,26 @@ function skipToMain(){
 ══════════════════════════════════════════ */
 function startPhotoScan(){
   goScreen('obs2');
+}
+
+function handlePhotoSelect(input){
+  if(!input.files||!input.files[0]) return;
+  // Show the selected photo as background of the frame, then proceed to scan
+  const file=input.files[0];
+  const url=URL.createObjectURL(file);
+  const oval=document.querySelector('.obs2-oval');
+  if(oval){
+    oval.style.backgroundImage=`url(${url})`;
+    oval.style.backgroundSize='cover';
+    oval.style.backgroundPosition='center';
+    oval.style.borderStyle='solid';
+    oval.style.borderColor='var(--gold)';
+  }
+  showToast('📸 照片已选择，正在分析…');
+  setTimeout(()=>{
+    goScreen('obs3');
+    startScanTimer();
+  }, 800);
 }
 
 let scanTimer=null;
